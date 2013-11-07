@@ -4,7 +4,6 @@ package effconnectivity;
 
 import java.util.*;
 import java.io.*;
-//import java.awt.*;
 
 
 public class ASHM
@@ -261,32 +260,8 @@ public class ASHM
 	return Hist.Density;
 	
 	}
-	
-
-//// 	MAIN CODE
-//    public static void main(String[] args) {
-
-//	ArrayList<String> Files = new ArrayList<String> ();
-////	Files.add("data/x1.txt");
-//	Files.add("data/x2.txt");
-////	Files.add("data/x3.txt");
-////	Files.add("data/x1.txt");
-
-//	ProbDensity Density = GeneratePDF(Files, 20, 1);
-
-//		for(int i=0; i<Density.bins+2*(Density.shifts-1); i++) {
-//			for(int j=0; j<Density.bins+2*(Density.shifts-1); j++) {
-//				int[] pos = {i,j};
-//				System.out.print(Density.get(pos));
-//				System.out.print(", ");
-//			}
-//			System.out.println();
-//		}
-
-//	}
-//	
-//	
 
 }
+
 
 
