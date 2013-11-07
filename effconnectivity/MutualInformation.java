@@ -99,37 +99,14 @@ public class MutualInformation
 				else PIY =PY.get(new int[] {j});
 				HY -= PY.get(new int[] {j})*Math.log(PIY)/Math.log(2)/(double)N;
 		}
-		
+		 
+		// Normalize Entropy value
 //		if (HX>HY) MI=MI/HX;
 //		else MI = MI/HY;
 		
 	}
 
-//	
-//	public static void main(String[] args) {
-//	
-//		ArrayList<String> FileNames = new ArrayList<String> ();
-////		FileNames.add("data/x2.txt");
-////		FileNames.add("data/x2.txt");
-//		
-////		FileNames.add("data/ESP_2011_2012.txt");
-////		FileNames.add("data/EGY_2011_2012.txt");
-////		FileNames.add("data/ESP_2009_2010.txt");
-////		FileNames.add("data/EGY_2009_2010.txt");
-//		FileNames.add("data/ESP_2007_2008.txt");
-//		FileNames.add("data/EGY_2007_2008.txt");
-//		
-//		MutualInformation MutInfo = new MutualInformation(FileNames, 25, 2);
-//		
-//		System.out.println("");
-//		System.out.println("Mutual Information x-y");
-//		System.out.println(MutInfo.MI);
-//		System.out.println("Entropy of x");
-//		System.out.println(MutInfo.HX);
-//		System.out.println("Entropy of y");
-//		System.out.println(MutInfo.HY);
-//	
-//	}
+
 
 
 
