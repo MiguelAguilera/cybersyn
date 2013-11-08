@@ -1,0 +1,52 @@
+#!/usr/bin/python
+
+import mechanize, httplib, socket, ssl, zipfile, os, tempfile, time, sys
+
+if len(sys.argv) != 4:
+    print "Usage: " + sys.argv[0] + " <pad> <user> <pass>"
+    exit(1)
+
+(_, PAD, USER, PASS) = sys.argv
+
+BASE_URL = 'http://' + PAD + '.titanpad.com'
+PADS_URL = BASE_URL + '/ep/padlist/all-pads.zip'
+
+def connect(self):
+    sock = socket.create_connection((self.host, self.port),
+                                        self.timeout, self.source_address)
+    if self._tunnel_host:
+        self.sock = sock
+        self._tunnel()
+    self.sock = ssl.wrap_socket(sock, self.key_file,
+                                self.cert_file,
+                                ssl_version=ssl.PROTOCOL_SSLv3)
+
+def unzip(filename):
+    zfile = zipfile.ZipFile(filename)
+    for name in zfile.namelist():
+        fd = open(name,"w")
+        fd.write(zfile.read(name))
+        fd.close()
+
+httplib.HTTPSConnection.connect = connect
+
+browser = mechanize.Browser()
+browser.open(BASE_URL)
+browser.select_form(nr=0)
+browser.form['email'] = USER
+browser.form['password'] = PASS
+browser.submit()
+
+tmpdir = tempfile.mkdtemp()
+cwd = os.getcwd()
+os.chdir(tmpdir)
+
+zipfilename = 'pads.zip'
+browser.retrieve(PADS_URL, zipfilename)
+unzip(zipfilename)
+current_time = time.time()
+num_lines = os.popen('html2text *.html | wc -l', 'r').read()
+print current_time, num_lines,
+
+os.chdir(cwd)
+os.system('rm -rf ' + tmpdir)
