@@ -21,6 +21,8 @@ def connect(self):
                                 self.cert_file,
                                 ssl_version=ssl.PROTOCOL_SSLv3)
 
+httplib.HTTPSConnection.connect = connect
+
 def unzip(filename):
     zfile = zipfile.ZipFile(filename)
     for name in zfile.namelist():
@@ -28,25 +30,30 @@ def unzip(filename):
         fd.write(zfile.read(name))
         fd.close()
 
-httplib.HTTPSConnection.connect = connect
+def pad_lines(pad, user, password):
+    browser = mechanize.Browser()
+    browser.open(BASE_URL)
+    browser.select_form(nr=0)
+    browser.form['email'] = USER
+    browser.form['password'] = PASS
+    browser.submit()
 
-browser = mechanize.Browser()
-browser.open(BASE_URL)
-browser.select_form(nr=0)
-browser.form['email'] = USER
-browser.form['password'] = PASS
-browser.submit()
+    tmpdir = tempfile.mkdtemp()
+    cwd = os.getcwd()
+    os.chdir(tmpdir)
 
-tmpdir = tempfile.mkdtemp()
-cwd = os.getcwd()
-os.chdir(tmpdir)
+    zipfilename = 'pads.zip'
+    browser.retrieve(PADS_URL, zipfilename)
+    unzip(zipfilename)
 
-zipfilename = 'pads.zip'
-browser.retrieve(PADS_URL, zipfilename)
-unzip(zipfilename)
+    num_lines = os.popen('html2text *.html | wc -l', 'r').read()
+
+    os.chdir(cwd)
+    os.system('rm -rf ' + tmpdir)
+
+    return num_lines
+
 current_time = time.time()
-num_lines = os.popen('html2text *.html | wc -l', 'r').read()
+num_lines = pad_lines(PAD, USER, PASS)
 print current_time, num_lines,
 
-os.chdir(cwd)
-os.system('rm -rf ' + tmpdir)
