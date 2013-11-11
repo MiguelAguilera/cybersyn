@@ -10,15 +10,15 @@ CURRENT_TIME = time.time()
 def main():
     if (len(argv) == 3):
         multi_pad_stats(argv[1], argv[2])
-    elif len(argv) == 4:
-        pad_stats(argv[1], argv[2], argv[3])
+    elif len(argv) == 5:
+        pad_stats(argv[1], argv[2], argv[3], argv[4])
     else:
         print "Usage: "
-        print "\t" + argv[0] + " <pad> <user> <pass>"
-        print "   or: "
+        print "\t" + argv[0] + " <name> <pad> <user> <pass>"
+        print " or: "
         print "\t" + argv[0] + " <file> <logspath>"
         print
-        print "  <file> can contain multiple lines with <pad> <user> <pass> format\n"
+        print " <file> can contain multiple lines with <name> <pad> <user> <pass> format\n"
         exit(1)
 
 def connect(self):
@@ -40,7 +40,7 @@ def unzip(filename):
         fd.write(zfile.read(name))
         fd.close()
 
-def pad_lines(pad, user, password):
+def pad_lines(name, pad, user, password):
     base_url = 'http://' + pad + '.' + DOMAIN
     browser = mechanize.Browser()
     browser.open(base_url)
@@ -64,8 +64,8 @@ def pad_lines(pad, user, password):
 
     return num_lines
 
-def pad_stats(pad, user, password):
-    num_lines = pad_lines(pad, user, password)
+def pad_stats(name, pad, user, password):
+    num_lines = pad_lines(name, pad, user, password)
     print CURRENT_TIME, num_lines,
 
 def multi_pad_stats(conf, logs):
@@ -74,10 +74,10 @@ def multi_pad_stats(conf, logs):
         lines = f.readlines()
 
     for line in lines:
-        (pad, user, password) = line.split(' ')
+        (name, pad, user, password) = line.split(' ')
         password = password.strip("\n")
-        num_lines = pad_lines(pad, user, password)
-        log = logs + '/' + pad + '.stats'
+        num_lines = pad_lines(name, pad, user, password)
+        log = logs + '/' + name + '.stats'
         with open(log, 'a') as f:
             f.write(str(CURRENT_TIME) + ' ' + str(num_lines))
 
