@@ -1,12 +1,20 @@
 #!/usr/bin/env python
 
-import mechanize, httplib, socket, ssl, zipfile, os, tempfile, time
+import mechanize
+import httplib
+import socket
+import ssl
+import zipfile
+import os
+import tempfile
+import time
 from sys import argv
 from sys import version_info
 
 DOMAIN = 'titanpad.com'
 PADS_URL = '/ep/padlist/all-pads.zip'
 CURRENT_TIME = time.time()
+
 
 def main():
     if (len(argv) == 3):
@@ -22,12 +30,13 @@ def main():
         print " <file> can contain multiple lines with <name> <pad> <user> <pass> format\n"
         exit(1)
 
+
 def connect(self):
-    if version_info < (2,7,0):
+    if version_info < (2, 7, 0):
         sock = socket.create_connection((self.host, self.port), self.timeout)
     else:
         sock = socket.create_connection((self.host, self.port),
-                                            self.timeout, self.source_address)
+                                        self.timeout, self.source_address)
 
     if self._tunnel_host:
         self.sock = sock
@@ -38,12 +47,14 @@ def connect(self):
 
 httplib.HTTPSConnection.connect = connect
 
+
 def unzip(filename):
     zfile = zipfile.ZipFile(filename)
     for name in zfile.namelist():
-        fd = open(name,"w")
+        fd = open(name, "w")
         fd.write(zfile.read(name))
         fd.close()
+
 
 def pad_lines(name, pad, user, password):
     base_url = 'http://' + pad + '.' + DOMAIN
@@ -69,9 +80,11 @@ def pad_lines(name, pad, user, password):
 
     return num_lines
 
+
 def pad_stats(name, pad, user, password):
     num_lines = pad_lines(name, pad, user, password)
     print CURRENT_TIME, num_lines,
+
 
 def multi_pad_stats(conf, logs):
     lines = []
