@@ -1,7 +1,8 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 import mechanize, httplib, socket, ssl, zipfile, os, tempfile, time
 from sys import argv
+from sys import version_info
 
 DOMAIN = 'titanpad.com'
 PADS_URL = '/ep/padlist/all-pads.zip'
@@ -22,8 +23,12 @@ def main():
         exit(1)
 
 def connect(self):
-    sock = socket.create_connection((self.host, self.port),
-                                        self.timeout, self.source_address)
+    if version_info < (2,7,0):
+        sock = socket.create_connection((self.host, self.port), self.timeout)
+    else:
+        sock = socket.create_connection((self.host, self.port),
+                                            self.timeout, self.source_address)
+
     if self._tunnel_host:
         self.sock = sock
         self._tunnel()
