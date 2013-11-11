@@ -1,15 +1,25 @@
 #!/usr/bin/python
 
-import mechanize, httplib, socket, ssl, zipfile, os, tempfile, time, sys
+import mechanize, httplib, socket, ssl, zipfile, os, tempfile, time
+from sys import argv
 
-if len(sys.argv) != 4:
-    print "Usage: " + sys.argv[0] + " <pad> <user> <pass>"
-    exit(1)
+DOMAIN = 'titanpad.com'
+PADS_URL = '/ep/padlist/all-pads.zip'
+CURRENT_TIME = time.time()
 
-(_, PAD, USER, PASS) = sys.argv
-
-BASE_URL = 'http://' + PAD + '.titanpad.com'
-PADS_URL = BASE_URL + '/ep/padlist/all-pads.zip'
+def main():
+    if (len(argv) == 3):
+        multi_pad_stats(argv[1], argv[2])
+    elif len(argv) == 4:
+        pad_stats(argv[1], argv[2], argv[3])
+    else:
+        print "Usage: "
+        print "\t" + argv[0] + " <pad> <user> <pass>"
+        print "   or: "
+        print "\t" + argv[0] + " <file> <logspath>"
+        print
+        print "  <file> can contain multiple lines with <pad> <user> <pass> format\n"
+        exit(1)
 
 def connect(self):
     sock = socket.create_connection((self.host, self.port),
@@ -31,11 +41,12 @@ def unzip(filename):
         fd.close()
 
 def pad_lines(pad, user, password):
+    base_url = 'http://' + pad + '.' + DOMAIN
     browser = mechanize.Browser()
-    browser.open(BASE_URL)
+    browser.open(base_url)
     browser.select_form(nr=0)
-    browser.form['email'] = USER
-    browser.form['password'] = PASS
+    browser.form['email'] = user
+    browser.form['password'] = password
     browser.submit()
 
     tmpdir = tempfile.mkdtemp()
@@ -43,7 +54,7 @@ def pad_lines(pad, user, password):
     os.chdir(tmpdir)
 
     zipfilename = 'pads.zip'
-    browser.retrieve(PADS_URL, zipfilename)
+    browser.retrieve(base_url + PADS_URL, zipfilename)
     unzip(zipfilename)
 
     num_lines = os.popen('html2text *.html | wc -l', 'r').read()
@@ -53,7 +64,22 @@ def pad_lines(pad, user, password):
 
     return num_lines
 
-current_time = time.time()
-num_lines = pad_lines(PAD, USER, PASS)
-print current_time, num_lines,
+def pad_stats(pad, user, password):
+    num_lines = pad_lines(pad, user, password)
+    print CURRENT_TIME, num_lines,
 
+def multi_pad_stats(conf, logs):
+    lines = []
+    with open(conf) as f:
+        lines = f.readlines()
+
+    for line in lines:
+        (pad, user, password) = line.split(' ')
+        password = password.strip("\n")
+        num_lines = pad_lines(pad, user, password)
+        log = logs + '/' + pad + '.stats'
+        with open(log, 'a') as f:
+            f.write(str(CURRENT_TIME) + ' ' + str(num_lines))
+
+if __name__ == '__main__':
+    main()
