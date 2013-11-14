@@ -7,56 +7,15 @@ import java.io.*;
 public class Xcorr
 {
 
-	public ArrayList<Double> X1 = new ArrayList<Double> ();
-	public ArrayList<Double> X2 = new ArrayList<Double> ();
 	public ArrayList<Double> X = new ArrayList<Double> ();
 
 
-	public Xcorr(String File1, String File2 ) {
+	public Xcorr(ArrayList<Double> X1 , ArrayList<Double> X2 ) {
 	
-		X1=LoadData(File1);
-		X2=LoadData(File2);
-		
+
 		X=CrossCorrelation(ZeroMeanNormalizedTransform(X1),ZeroMeanNormalizedTransform(X2));
 	}
 
-	private ArrayList<Double> LoadData(String FileName) {  
-	   
-		ArrayList<Double> x1 = new ArrayList<Double>();
-		try {
-            
-			File f = new File(FileName);
-			Scanner in = new Scanner(f); 
-
-	   		
-			int i = 0;
-           	while (in.hasNextDouble()) {
-				x1.add(in.nextDouble());
-	       		//System.out.println(x1.get(i));
-				i++;
-            }
-	    
-//	    int indx1=x1.size();
-	    //System.out.println(indx1);
-//	    X.add(x1);
-		} catch (FileNotFoundException e) {
-            System.out.println("Fichero no existe");
-		} catch (IOException e) {
-            System.out.println("Error I/O");
-		}
-            
-		return x1;
-		
-	}
-
-//    private double getMax(ArrayList<Double> x) {
-//	Collections.sort(x); // Sort the arraylist
-//	return x.get(x.size()-1);
-//    }
-//    public double getMin(ArrayList<Double> x) {
-//	Collections.sort(x); // Sort the arraylist
-//	return x.get(0);
-//    }
 
 	private double calculateAverage(ArrayList<Double> x) {
 		double sum = 0;
