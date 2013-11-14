@@ -14,13 +14,12 @@ public class MutualInformation
 	private double HX;
 	private double HY;
 	
-	private double bins;
-	private double shifts;
+//	private double bins;
+//	private double shifts;
 	
 	public MutualInformation(TimeSeries X1 , TimeSeries X2 , double bins, double shifts) {
 
 
-		
 		
 //		Compute probability density function of x
 		ArrayList<ArrayList<Double>> Xseries1 = new ArrayList<ArrayList<Double>> ();
@@ -79,7 +78,13 @@ public class MutualInformation
 		
 	}
 
-
+	public static double get(TimeSeries X1 , TimeSeries X2 , double bins, double shifts) {
+	
+		MutualInformation MutualInfo = new MutualInformation(X1, X2, bins, shifts);
+		
+		return MutualInfo.MI;
+	
+	}
 
 
 
