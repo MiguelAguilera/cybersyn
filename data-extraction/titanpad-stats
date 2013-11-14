@@ -7,13 +7,13 @@ import ssl
 import zipfile
 import os
 import tempfile
-import time
+from datetime import datetime
 from sys import argv
 from sys import version_info
 
 DOMAIN = 'titanpad.com'
 PADS_URL = '/ep/padlist/all-pads.zip'
-CURRENT_TIME = time.time()
+CURRENT_TIME = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
 def main():
