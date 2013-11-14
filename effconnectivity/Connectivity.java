@@ -1,4 +1,3 @@
-
 package effconnectivity;
 
 import java.util.*;
@@ -60,10 +59,6 @@ public class Connectivity
 			}
 			System.out.println();	
 			
-		System.out.println(mode);			
-		System.out.println(bins);			
-		System.out.println(shifts);		
-		System.out.println(m);		
 		
 			for (int i=0;i<Nf;i++) {
 				num1=nums.get(i);
