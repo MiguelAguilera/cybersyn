@@ -17,57 +17,30 @@ public class MutualInformation
 	private double bins;
 	private double shifts;
 	
-	public MutualInformation(ArrayList<String> FileNames, double bins, double shifts) {
+	public MutualInformation(TimeSeries X1 , TimeSeries X2 , double bins, double shifts) {
 
-//		MI=0;
-		
-		int[] Delays = new int[2];
-		Delays[0]=0;
-		Delays[1]=0;
+
 		
 		
 //		Compute probability density function of x
-//		System.out.println("Px");
-		ArrayList<String> File1 = new ArrayList<String> ();
-		File1.add(FileNames.get(0));
-		int[] delay1 = new int[1];
-		delay1[0]=Delays[0];
-		PX = ASHM.GeneratePDF(File1, delay1, bins, shifts);
+		ArrayList<ArrayList<Double>> Xseries1 = new ArrayList<ArrayList<Double>> ();
+		Xseries1.add(X1.X);
+
+		PX = ASHM.GeneratePDF(Xseries1, bins, shifts);
 		
-//		for(int i=0; i<bins+2*(shifts-1); i++) {
-//				int[] pos = {i};
-//				System.out.print(PX.get(pos));
-//				System.out.print(", ");
-//		}
-//		System.out.println();
+		Xseries1.set(0,X2.X);
+		PY = ASHM.GeneratePDF(Xseries1, bins, shifts);
 		
-//		Compute probability density function of y
-//		System.out.println("Py");
-		File1.set(0,FileNames.get(1));
-		delay1[0]=Delays[1];
-		PY = ASHM.GeneratePDF(File1, delay1, bins, shifts);
-		
-//		for(int i=0; i<bins+2*(shifts-1); i++) {
-//				int[] pos = {i};
-//				System.out.print(PY.get(pos));
-//				System.out.print(", ");
-//		}
-//		System.out.println();
-		
+
 		
 //		Compute joint probability density function of x and y
-//		System.out.println("Pxy");
-		PXY = ASHM.GeneratePDF(FileNames, Delays, bins, shifts);
+
+		Xseries1.set(0,X1.X);
+		Xseries1.add(X2.X);
 		
-//		for(int i=0; i<bins+2*(shifts-1); i++) {
-//			for(int j=0; j<bins+2*(shifts-1); j++) {
-//				int[] pos = {i,j};
-//				System.out.print(PXY.get(pos));
-//				System.out.print(", ");
-//			}
-//			System.out.println();
-//		}
-//		
+		PXY = ASHM.GeneratePDF(Xseries1, bins, shifts);
+		
+
 		int N= PX.N;
 		
 		double PI, PIX, PIY;
