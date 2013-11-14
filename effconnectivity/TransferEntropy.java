@@ -12,12 +12,11 @@ public class TransferEntropy
 	private ProbDensity PY1Y;
 	private ProbDensity PXY;
 	public double TE;
-
 	
-	private double bins;
-	private double shifts;
+//	private double bins;
+//	private double shifts;
 	
-	public TransferEntropy(TimeSeries X1 , TimeSeries X2, int m, double bins, double shifts) {
+	public TransferEntropy(TimeSeries X1 , TimeSeries X2, double bins, double shifts, int m) {
 
 //		Compute probability density function of yn+1, xn, yn
 		ArrayList<ArrayList<Double>> Xseries1 = new ArrayList<ArrayList<Double>> ();
@@ -116,5 +115,12 @@ public class TransferEntropy
 
 	}
 	
-
+	public static double get(TimeSeries X1 , TimeSeries X2 , double bins, double shifts, int m) {
+	
+		TransferEntropy TransfE = new TransferEntropy(X1, X2, bins, shifts, m);
+		
+		return TransfE.TE;
+	
+	}
+	
 }
