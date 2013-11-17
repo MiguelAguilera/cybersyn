@@ -7,25 +7,30 @@ import ssl
 import zipfile
 import os
 import tempfile
+import sqlite3
 from datetime import datetime
 from sys import argv
 from sys import version_info
 
 DOMAIN = 'titanpad.com'
 PADS_URL = '/ep/padlist/all-pads.zip'
+DATABASE = 'stats.db'
 CURRENT_TIME = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
 def main():
-    if (len(argv) == 3):
-        multi_pad_stats(argv[1], argv[2])
-    elif len(argv) == 5:
-        pad_stats(argv[1], argv[2], argv[3], argv[4])
+    if len(argv) == 5:
+        print_pad_stats(argv[1], argv[2], argv[3], argv[4])
+    elif (len(argv) == 3):
+        DATABASE = argv[2]
+        update_stats_db(argv[1])
+    elif (len(argv) == 2):
+        update_stats_db(argv[1])
     else:
         print "Usage: "
         print "\t" + argv[0] + " <name> <pad> <user> <pass>"
         print " or: "
-        print "\t" + argv[0] + " <file> <logspath>"
+        print "\t" + argv[0] + " <file> [dbfile]"
         print
         print " <file> can contain multiple lines with <name> <pad> <user> <pass> format\n"
         exit(1)
@@ -81,23 +86,35 @@ def pad_lines(name, pad, user, password):
     return num_lines
 
 
-def pad_stats(name, pad, user, password):
+def print_pad_stats(name, pad, user, password):
     num_lines = pad_lines(name, pad, user, password)
     print CURRENT_TIME, num_lines,
 
 
-def multi_pad_stats(conf, logs):
+def sqlite_store(c, name, lines):
+    c.execute("SELECT lines FROM stats WHERE name = ? ORDER BY time DESC LIMIT 1", (name,))
+    result = c.fetchone()
+    if (result == None) or (lines != result[0]):
+        c.execute('INSERT INTO stats VALUES (?, ?, ?)', (name, lines, CURRENT_TIME))
+
+
+def update_stats_db(conf):
     lines = []
     with open(conf) as f:
         lines = f.readlines()
+
+    conn = sqlite3.connect(DATABASE)
+    c = conn.cursor()
+    c.execute('CREATE TABLE IF NOT EXISTS stats (name TEXT, lines INTEGER, time TEXT)')
 
     for line in lines:
         (name, pad, user, password) = line.split(' ')
         password = password.strip("\n")
         num_lines = pad_lines(name, pad, user, password)
-        log = logs + '/' + name + '.stats'
-        with open(log, 'a') as f:
-            f.write(str(CURRENT_TIME) + ' ' + str(num_lines))
+        sqlite_store(c, name, num_lines)
+
+    conn.commit()
+    conn.close()
 
 if __name__ == '__main__':
     main()
