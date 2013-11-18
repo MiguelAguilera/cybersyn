@@ -1,0 +1,11 @@
+#!/bin/bash
+
+DB="stats.db"
+
+sqlite3 $DB <<EOF
+.headers on
+.mode csv
+.output stats.csv
+select * from stats;
+EOF
+
