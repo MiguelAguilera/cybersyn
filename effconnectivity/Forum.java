@@ -1,3 +1,4 @@
+// Load data from forum files
 package effconnectivity;
 
 import java.util.*;
