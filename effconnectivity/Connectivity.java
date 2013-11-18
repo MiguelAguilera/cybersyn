@@ -1,3 +1,4 @@
+
 package effconnectivity;
 
 import java.util.*;
@@ -38,7 +39,7 @@ public class Connectivity
 
 
 
-		Forum foro = new Forum("data/forum/forums.csv",3600*6,10);	
+		Forum foro = new Forum("data/forum/forums.csv",3600*6,20);	
 				
 		ArrayList<Integer> nums = foro.indsF_written;
 		
@@ -58,7 +59,7 @@ public class Connectivity
 				System.out.print(Forums.get(i));
 			}
 			System.out.println();	
-			
+				
 		
 			for (int i=0;i<Nf;i++) {
 				num1=nums.get(i);
