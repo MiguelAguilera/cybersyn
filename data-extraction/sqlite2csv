@@ -1,11 +1,13 @@
 #!/bin/bash
 
 DB="stats.db"
+OUTFILE="stats.csv"
 
 sqlite3 $DB <<EOF
 .headers off
 .mode csv
-.output stats.csv
+.output $OUTFILE
 select * from stats;
 EOF
 
+sed -i 's/"//g' $OUTFILE
