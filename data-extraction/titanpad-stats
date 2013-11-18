@@ -82,7 +82,7 @@ def pad_lines(name, pad, user, password):
     os.chdir(cwd)
     os.system('rm -rf ' + tmpdir)
 
-    return num_lines
+    return int(num_lines)
 
 
 def print_pad_stats(pad, user, password):
