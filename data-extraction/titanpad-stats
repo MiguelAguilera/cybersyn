@@ -14,17 +14,16 @@ from sys import version_info
 
 DOMAIN = 'titanpad.com'
 PADS_URL = '/ep/padlist/all-pads.zip'
-DATABASE = 'stats.db'
+DEFAULT_DATABASE = 'stats.db'
 CURRENT_TIME = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
 def main():
     if len(argv) == 4:
         print_pad_stats(argv[1], argv[2], argv[3])
-    elif (len(argv) == 3):
-        DATABASE = argv[2]
-        update_stats_db(argv[1])
-    elif (len(argv) == 2):
+    elif len(argv) == 3:
+        update_stats_db(argv[1], argv[2])
+    elif len(argv) == 2:
         update_stats_db(argv[1])
     else:
         print "Usage: "
@@ -98,12 +97,12 @@ def sqlite_store(c, name, lines):
         c.execute('INSERT INTO stats VALUES (?, ?, ?)', (name, lines, CURRENT_TIME))
 
 
-def update_stats_db(conf):
+def update_stats_db(conf, database=DEFAULT_DATABASE):
     lines = []
     with open(conf) as f:
         lines = f.readlines()
 
-    conn = sqlite3.connect(DATABASE)
+    conn = sqlite3.connect(database)
     c = conn.cursor()
     c.execute('CREATE TABLE IF NOT EXISTS stats (name TEXT, lines INTEGER, time TEXT)')
 
