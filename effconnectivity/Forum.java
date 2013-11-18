@@ -6,6 +6,7 @@ import java.io.*;
 import java.text.*;
 
 
+
 public class Forum 
 {
 
@@ -60,7 +61,6 @@ public class Forum
 						} catch (ParseException ex) {
 								  ex.printStackTrace(); // or log it using a logging framework
 						}
-					
 					TimeStamps.add(date2.getTime()/1000L);
 					
 			}
@@ -97,16 +97,25 @@ public class Forum
     	
 	private void WriteData(int step, int minPosts) {
 		
-//		System.out.println(TimeStamps);
-		File Ffile;
-		long minTimeStamp = Collections.min(TimeStamps);
-		long maxTimeStamp = Collections.max(TimeStamps);
+
+		// Period of analysis of 1 month from actual instant
+		long Period = 3600*24*30;
+
+		Date date = new Date();
+		long maxTimeStamp = date.getTime()/1000L;
+		long minTimeStamp = maxTimeStamp - Period;
+
 		
+//		System.out.println(date.getTime()/1000L);
+
+		File Ffile;
 		
 		int[] x ;				//time series of number of posts per period
 		int N = (int)Math.ceil(((double)maxTimeStamp-(double)minTimeStamp+1)/(double)step);
 		int countPosts;			//counter of total posts per forum
 		int indT;				//index of x for each TimeStamp
+		
+		
 		
 		
 		// Extract time series for each forum and write to file
