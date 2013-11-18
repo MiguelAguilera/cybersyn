@@ -19,8 +19,8 @@ CURRENT_TIME = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
 def main():
-    if len(argv) == 5:
-        print_pad_stats(argv[1], argv[2], argv[3], argv[4])
+    if len(argv) == 4:
+        print_pad_stats(argv[1], argv[2], argv[3])
     elif (len(argv) == 3):
         DATABASE = argv[2]
         update_stats_db(argv[1])
@@ -28,7 +28,7 @@ def main():
         update_stats_db(argv[1])
     else:
         print "Usage: "
-        print "\t" + argv[0] + " <name> <pad> <user> <pass>"
+        print "\t" + argv[0] + " <pad> <user> <pass>"
         print " or: "
         print "\t" + argv[0] + " <file> [dbfile]"
         print
@@ -86,8 +86,8 @@ def pad_lines(name, pad, user, password):
     return num_lines
 
 
-def print_pad_stats(name, pad, user, password):
-    num_lines = pad_lines(name, pad, user, password)
+def print_pad_stats(pad, user, password):
+    num_lines = pad_lines(pad, user, password)
     print CURRENT_TIME, num_lines,
 
 
