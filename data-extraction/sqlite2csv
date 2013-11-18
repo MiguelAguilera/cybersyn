@@ -3,7 +3,7 @@
 DB="stats.db"
 
 sqlite3 $DB <<EOF
-.headers on
+.headers off
 .mode csv
 .output stats.csv
 select * from stats;
