@@ -37,9 +37,12 @@ public class Connectivity
 			}
 		}
 
+		int Nmin = 20;
+		
+		int Tspan = 3600*24;
+		
 
-
-		Forum foro = new Forum("data/forum/forums.csv",3600*6,20);	
+		Forum foro = new Forum("data/forum/forums.csv",3600*6,Nmin,Period);	
 				
 		ArrayList<Integer> nums = foro.indsF_written;
 		

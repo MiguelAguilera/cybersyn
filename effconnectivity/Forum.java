@@ -18,10 +18,10 @@ public class Forum
 	public ArrayList<String> namesF_written = new ArrayList<String>();	//List of forum ids
 
 
-	public Forum(String FileName, int step, int minPosts) {
+	public Forum(String FileName, int step, int minPosts, int Period) {
 		
 		LoadData(FileName);
-		WriteData(step, minPosts);
+		WriteData(step, minPosts, Period);
 		
 		
 	}
@@ -94,11 +94,11 @@ public class Forum
 
     	}
     	
-	private void WriteData(int step, int minPosts) {
+	private void WriteData(int step, int minPosts, int Period) {
 		
 
 		// Period of analysis of 1 month from actual instant
-		long Period = 3600*24*30;
+//		long Period = 3600*24*30;
 
 		Date date = new Date();
 		long maxTimeStamp = date.getTime()/1000L;
