@@ -1,0 +1,9 @@
+#!/usr/bin/env python
+
+from urllib2 import urlopen
+from simplejson import loads
+
+content = loads(urlopen('http://graph.facebook.com/PartidoXPartidodelFuturo').read())
+
+print content['likes']
+print content['talking_about_count']
