@@ -3,7 +3,7 @@
 from urllib2 import urlopen
 from simplejson import loads
 
-content = loads(urlopen('http://graph.facebook.com/PartidoXPartidodelFuturo').read())
+content = loads(urlopen('http://graph.facebook.com/473881175964178').read())
 
 print content['likes']
 print content['talking_about_count']
