@@ -1,0 +1,32 @@
+#!/usr/bin/env python
+from twython import Twython
+
+APP_KEY=" "
+APP_SECRET = " "
+
+twitter = Twython(APP_KEY, APP_SECRET)
+auth = twitter.get_authentication_tokens()
+
+OAUTH_TOKEN = auth['oauth_token']
+OAUTH_TOKEN_SECRET = auth['oauth_token_secret']
+
+isError=0
+done = 0
+
+while done==0:
+	try:
+		response = twitter.show_user(screen_name = "partido_x")
+	except TwythonRateLimitError:
+		isError = 1
+	except TwythonError:
+		isError = 1
+	if isError == 0:
+		print response['followers_count']
+		print response['statuses_count']
+		done=1
+	else:
+		sleep(60)
+		print 'error: waiting for 60 seconds'
+	
+	
+
