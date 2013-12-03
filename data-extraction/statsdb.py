@@ -33,7 +33,9 @@ class StatsDB():
                 self.c.execute(select_from + ' ORDER BY time DESC LIMIT 1')
             result = self.c.fetchone()
         if (result == None) or (norepeat_value != result[0]):
-            self.c.execute('INSERT INTO ' + table + ' VALUES (?, ?, ?)', values)
+            placeholder = '?,' * len(values)
+            placeholder = placeholder[:-1]
+            self.c.execute('INSERT INTO ' + table + ' VALUES (' + placeholder + ')', values)
 
     def save(self):
         self.conn.commit()
