@@ -104,6 +104,7 @@ public class Forum
 		Date date = new Date();
 		long maxTimeStamp = date.getTime()/1000L;
 		long minTimeStamp = maxTimeStamp - Tspan;
+		
 
 		
 //		System.out.println(date.getTime()/1000L);
@@ -131,8 +132,8 @@ public class Forum
 				if(indsF.get(ind)==F.get(i)) {
 					countPosts++;
 					indT=(int)Math.ceil(( (double)TimeStamps.get(i)-(double)minTimeStamp+1)/(double)sampling);
-					x[indT-1]=x[indT-1]+1;
-
+					if(indT>=1)
+						x[indT-1]=x[indT-1]+1;
 					}
 			}
 			
