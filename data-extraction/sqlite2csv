@@ -1,8 +1,8 @@
 #!/bin/bash
 
-DB="stats.db"
+DB=$1
 
-TABLE=$1
+TABLE=$2
 
 if [ -x "$TABLE" ]
 then
