@@ -1,6 +1,8 @@
 #!/bin/bash
 
-DB=$1
+PATH=$1
+
+DB="${PATH}/stats.db"
 
 TABLE=$2
 
@@ -9,7 +11,7 @@ then
     echo "Usage: $0 <table>"
 fi
 
-OUTFILE="${TABLE}.csv"
+OUTFILE="${PATH}/${TABLE}.csv"
 
 sqlite3 $DB <<EOF
 .headers off
