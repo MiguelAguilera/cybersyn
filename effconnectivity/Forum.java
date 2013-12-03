@@ -20,6 +20,7 @@ public class Forum
 
 	public Forum(String FileName, int sampling, int minPosts, long Tspan) {
 		
+		
 		LoadData(FileName);
 		WriteData(sampling, minPosts, Tspan);
 		
@@ -128,10 +129,10 @@ public class Forum
 			for (int i=0;i<F.size();i++) {
 			
 				if(indsF.get(ind)==F.get(i)) {
-//					System.out.println(F.get(i));
 					countPosts++;
 					indT=(int)Math.ceil(( (double)TimeStamps.get(i)-(double)minTimeStamp+1)/(double)sampling);
 					x[indT-1]=x[indT-1]+1;
+
 					}
 			}
 			
