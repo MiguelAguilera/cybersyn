@@ -7,10 +7,10 @@ import ssl
 import zipfile
 import os
 import tempfile
-import sqlite3
 from datetime import datetime
 from sys import argv
 from sys import version_info
+from statsdb import StatsDB
 
 DOMAIN = 'titanpad.com'
 PADS_URL = '/ep/padlist/all-pads.zip'
@@ -90,30 +90,20 @@ def print_pad_stats(pad, user, password):
     print CURRENT_TIME, num_lines,
 
 
-def sqlite_store(c, name, lines):
-    c.execute("SELECT lines FROM stats WHERE name = ? ORDER BY time DESC LIMIT 1", (name,))
-    result = c.fetchone()
-    if (result == None) or (lines != result[0]):
-        c.execute('INSERT INTO stats VALUES (?, ?, ?)', (name, lines, CURRENT_TIME))
-
-
 def update_stats_db(conf, database=DEFAULT_DATABASE):
     lines = []
     with open(conf) as f:
         lines = f.readlines()
 
-    conn = sqlite3.connect(database)
-    c = conn.cursor()
-    c.execute('CREATE TABLE IF NOT EXISTS stats (name TEXT, lines INTEGER, time TEXT)')
+    db = StatsDB(database)
 
     for line in lines:
         (name, pad, user, password) = line.split(' ')
         password = password.strip("\n")
         num_lines = pad_lines(name, pad, user, password)
-        sqlite_store(c, name, num_lines)
+        db.insert(name, num_lines, CURRENT_TIME)
 
-    conn.commit()
-    conn.close()
+    db.save()
 
 if __name__ == '__main__':
     main()
