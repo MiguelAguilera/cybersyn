@@ -16,7 +16,7 @@ DOMAIN = 'titanpad.com'
 PADS_URL = '/ep/padlist/all-pads.zip'
 DEFAULT_DATABASE = 'stats.db'
 CURRENT_TIME = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-DB_TABLE = 'stats'
+DB_TABLE = 'pad_lines'
 
 def main():
     if len(argv) == 4:
