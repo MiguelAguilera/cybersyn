@@ -1,17 +1,19 @@
 #!/bin/bash
 
-PATH=$1
+DB="stats.db"
 
-DB="${PATH}/stats.db"
+PATH1=$1
+
+cd $PATH1
 
 TABLE=$2
 
 if [ -x "$TABLE" ]
 then
-    echo "Usage: $0 <table>"
+echo "Usage: $0 <table>"
 fi
 
-OUTFILE="${PATH}/${TABLE}.csv"
+OUTFILE="${TABLE}.csv"
 
 sqlite3 $DB <<EOF
 .headers off
@@ -21,3 +23,5 @@ select * from $TABLE;
 EOF
 
 sed -i 's/"//g' $OUTFILE
+
+
