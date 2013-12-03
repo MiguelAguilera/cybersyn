@@ -41,7 +41,7 @@ public class Connectivity
 
 		int Nmin = 20;
 		
-		long Tspan = 3600*24*30*3;
+		long Tspan = 3600*24*30*1;
 		int sampling = 3600*6;
 		
 
