@@ -1,8 +1,19 @@
 #!/usr/bin/env python
-from twython import Twython
 
-APP_KEY=" "
+from twython import Twython
+from sys import argv
+from datetime import datetime
+from statsdb import StatsDB
+
+if len(argv) < 2:
+    print "Usage: " + argv[0] + " <dbfile>"
+    exit(1)
+
+APP_KEY = " "
 APP_SECRET = " "
+
+DB_FILE = argv[1]
+CURRENT_TIME = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 twitter = Twython(APP_KEY, APP_SECRET)
 auth = twitter.get_authentication_tokens()
@@ -10,23 +21,28 @@ auth = twitter.get_authentication_tokens()
 OAUTH_TOKEN = auth['oauth_token']
 OAUTH_TOKEN_SECRET = auth['oauth_token_secret']
 
-isError=0
-done = 0
+is_error = False
+done = False
 
-while done==0:
-	try:
-		response = twitter.show_user(screen_name = "partido_x")
-	except TwythonRateLimitError:
-		isError = 1
-	except TwythonError:
-		isError = 1
-	if isError == 0:
-		print response['followers_count']
-		print response['statuses_count']
-		done=1
-	else:
-		sleep(60)
-		print 'error: waiting for 60 seconds'
-	
-	
+db = StatsDB(DB_FILE)
+db.init_table('tw_followers', ['#followers', 'time'])
+db.init_table('tw_statuses', ['#statuses', 'time'])
 
+while not done:
+    try:
+        response = twitter.show_user(screen_name = "partido_x")
+    except TwythonRateLimitError:
+        is_error = True
+    except TwythonError:
+        is_error = True
+    if is_error:
+        print 'error: waiting for 60 seconds'
+        sleep(60)
+    else:
+        followers = response['followers_count']
+        statuses = response['statuses_count']
+        db.insert('tw_followers', (followers, CURRENT_TIME), norepeat={'followers': followers})
+        db.insert('tw_statuses', (statuses, CURRENT_TIME), norepeat={'statuses': statuses})
+        done = True
+
+db.save()
