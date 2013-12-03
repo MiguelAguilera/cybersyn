@@ -5,7 +5,7 @@ from sys import argv
 from datetime import datetime
 from statsdb import StatsDB
 
-if len(argv) < 2:
+if len(argv) < 3:
     print "Usage: " + argv[0] + " <twitter.keys>" + " <dbfile>"
     exit(1)
 
