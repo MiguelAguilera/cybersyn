@@ -1,13 +1,21 @@
 #!/bin/bash
 
 DB="stats.db"
-OUTFILE="stats.csv"
+
+TABLE=$1
+
+if [ -x "$TABLE" ]
+then
+    echo "Usage: $0 <table>"
+fi
+
+OUTFILE="${TABLE}.csv"
 
 sqlite3 $DB <<EOF
 .headers off
 .mode csv
 .output $OUTFILE
-select * from stats;
+select * from $TABLE;
 EOF
 
 sed -i 's/"//g' $OUTFILE
