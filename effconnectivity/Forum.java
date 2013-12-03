@@ -18,10 +18,10 @@ public class Forum
 	public ArrayList<String> namesF_written = new ArrayList<String>();	//List of forum ids
 
 
-	public Forum(String FileName, int step, int minPosts, int Period) {
+	public Forum(String FileName, int sampling, int minPosts, long Tspan) {
 		
 		LoadData(FileName);
-		WriteData(step, minPosts, Period);
+		WriteData(sampling, minPosts, Tspan);
 		
 		
 	}
@@ -94,7 +94,7 @@ public class Forum
 
     	}
     	
-	private void WriteData(int step, int minPosts, int Period) {
+	private void WriteData(int sampling, int minPosts, long Tspan) {
 		
 
 		// Period of analysis of 1 month from actual instant
@@ -102,7 +102,7 @@ public class Forum
 
 		Date date = new Date();
 		long maxTimeStamp = date.getTime()/1000L;
-		long minTimeStamp = maxTimeStamp - Period;
+		long minTimeStamp = maxTimeStamp - Tspan;
 
 		
 //		System.out.println(date.getTime()/1000L);
@@ -110,7 +110,7 @@ public class Forum
 		File Ffile;
 		
 		int[] x ;				//time series of number of posts per period
-		int N = (int)Math.ceil(((double)maxTimeStamp-(double)minTimeStamp+1)/(double)step);
+		int N = (int)Math.ceil(((double)maxTimeStamp-(double)minTimeStamp+1)/(double)sampling);
 		int countPosts;			//counter of total posts per forum
 		int indT;				//index of x for each TimeStamp
 		
@@ -130,7 +130,7 @@ public class Forum
 				if(indsF.get(ind)==F.get(i)) {
 //					System.out.println(F.get(i));
 					countPosts++;
-					indT=(int)Math.ceil(( (double)TimeStamps.get(i)-(double)minTimeStamp+1)/(double)step);
+					indT=(int)Math.ceil(( (double)TimeStamps.get(i)-(double)minTimeStamp+1)/(double)sampling);
 					x[indT-1]=x[indT-1]+1;
 					}
 			}

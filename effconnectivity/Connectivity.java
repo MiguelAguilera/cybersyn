@@ -39,10 +39,11 @@ public class Connectivity
 
 		int Nmin = 20;
 		
-		int Tspan = 3600*24;
+		long Tspan = 3600*24*30*1;
+		int sampling = 3600*6;
 		
 
-		Forum foro = new Forum("data/forum/forums.csv",3600*6,Nmin,Period);	
+		Forum foro = new Forum("data/forum/forums.csv",sampling,Nmin,Tspan);	
 				
 		ArrayList<Integer> nums = foro.indsF_written;
 		
