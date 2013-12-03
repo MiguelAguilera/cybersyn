@@ -6,16 +6,16 @@ from datetime import datetime
 from statsdb import StatsDB
 
 if len(argv) < 2:
-    print "Usage: " + argv[0] + " <dbfile>"
+    print "Usage: " + argv[0] + " <twitter.keys>" + " <dbfile>"
     exit(1)
 
-KEY_FILE = 'twitter.keys'
+KEY_FILE = argv[1]
 
 with open(KEY_FILE) as f:
     APP_KEY = f.readline().strip("\n")
     APP_SECRET = f.readline().strip("\n")
 
-DB_FILE = argv[1]
+DB_FILE = argv[2]
 CURRENT_TIME = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 twitter = Twython(APP_KEY, APP_SECRET)
