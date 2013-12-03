@@ -102,7 +102,7 @@ def update_stats_db(conf, database=DEFAULT_DATABASE):
         (name, pad, user, password) = line.split(' ')
         password = password.strip("\n")
         num_lines = pad_lines(name, pad, user, password)
-        db.insert(DB_TABLE, (name, num_lines, CURRENT_TIME), norepeat={'pad_lines': num_lines}, where={'name': name})
+        db.insert(DB_TABLE, (name, num_lines, CURRENT_TIME), norepeat={'lines': num_lines}, where={'name': name})
 
     db.save()
 
