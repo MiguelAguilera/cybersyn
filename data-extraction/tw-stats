@@ -9,8 +9,11 @@ if len(argv) < 2:
     print "Usage: " + argv[0] + " <dbfile>"
     exit(1)
 
-APP_KEY = " "
-APP_SECRET = " "
+KEY_FILE = 'twitter.keys'
+
+with open(KEY_FILE) as f:
+    APP_KEY = f.readline().strip("\n")
+    APP_SECRET = f.readline().strip("\n")
 
 DB_FILE = argv[1]
 CURRENT_TIME = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
