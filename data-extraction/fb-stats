@@ -2,8 +2,29 @@
 
 from urllib2 import urlopen
 from simplejson import loads
+from sys import argv
+from datetime import datetime
+from statsdb import StatsDB
 
-content = loads(urlopen('http://graph.facebook.com/473881175964178').read())
+if len(argv) < 2:
+    print "Usage: " + argv[0] + " <dbfile>"
+    exit(1)
 
-print content['likes']
-print content['talking_about_count']
+DB_FILE = argv[1]
+URL = 'http://graph.facebook.com/473881175964178'
+CURRENT_TIME = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+content = loads(urlopen(URL).read())
+
+likes = content['likes']
+talking = content['talking_about_count']
+
+db = StatsDB(DB_FILE)
+
+db.init_table('fb_likes', ['#likes', 'time'])
+db.insert('fb_likes', (likes, CURRENT_TIME), norepeat={'likes': likes})
+
+db.init_table('fb_talking', ['#talking', 'time'])
+db.insert('fb_talking', (talking, CURRENT_TIME), norepeat={'talking': talking})
+
+db.save()
