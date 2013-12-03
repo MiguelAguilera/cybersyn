@@ -16,7 +16,7 @@ DOMAIN = 'titanpad.com'
 PADS_URL = '/ep/padlist/all-pads.zip'
 DEFAULT_DATABASE = 'stats.db'
 CURRENT_TIME = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
+DB_TABLE = 'stats'
 
 def main():
     if len(argv) == 4:
@@ -96,12 +96,13 @@ def update_stats_db(conf, database=DEFAULT_DATABASE):
         lines = f.readlines()
 
     db = StatsDB(database)
+    db.init_table(DB_TABLE, ['name', '#lines', 'time'])
 
     for line in lines:
         (name, pad, user, password) = line.split(' ')
         password = password.strip("\n")
         num_lines = pad_lines(name, pad, user, password)
-        db.insert(name, num_lines, CURRENT_TIME)
+        db.insert(DB_TABLE, (name, num_lines, CURRENT_TIME), norepeat={'lines': num_lines}, where={'name': name})
 
     db.save()
 
