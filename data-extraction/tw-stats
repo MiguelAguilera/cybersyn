@@ -44,8 +44,8 @@ while not done:
     else:
         followers = response['followers_count']
         statuses = response['statuses_count']
-        db.insert('tw_followers', (followers, CURRENT_TIME), norepeat={'followers': followers})
-        db.insert('tw_statuses', (statuses, CURRENT_TIME), norepeat={'statuses': statuses})
+        db.insert('tw_followers', ('tw_followers', num_lines, CURRENT_TIME), norepeat={'followers': followers}, where={'name': 'tw_followers'})
+        db.insert('tw_statuses', ('tw_statuses', num_lines, CURRENT_TIME), norepeat={'statuses': statuses}, where={'name': 'tw_statuses'})
         done = True
 
 db.save()
