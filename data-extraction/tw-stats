@@ -47,7 +47,7 @@ while not done:
         db.insert(DB_TABLE, (DB_TABLE, followers, CURRENT_TIME), norepeat={'followers': followers})
         
         
-        statuses = response['tw_statuses']
+        statuses = response['statuses_count']
         DB_TABLE = 'tw_statuses'
         db.insert(DB_TABLE, (DB_TABLE, followers, CURRENT_TIME), norepeat={'statuses': statuses})
         
