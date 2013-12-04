@@ -22,12 +22,12 @@ talking = content['talking_about_count']
 db = StatsDB(DB_FILE)
 
 DB_TABLE = 'fb_likes'
-db.init_table(DB_TABLE, ['#likes', 'time'])
+db.init_table(DB_TABLE, ['name','#likes', 'time'])
 db.insert(DB_TABLE, (DB_TABLE, likes, CURRENT_TIME), norepeat={'likes': likes})
 
 
 DB_TABLE = 'fb_talking'
-db.init_table(DB_TABLE, ['#talking', 'time'])
+db.init_table(DB_TABLE, ['name','#talking', 'time'])
 db.insert(DB_TABLE, (DB_TABLE, talking, CURRENT_TIME), norepeat={'talking': talking})
 
 
