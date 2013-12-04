@@ -23,12 +23,12 @@ db = StatsDB(DB_FILE)
 
 DB_TABLE = 'fb_likes'
 db.init_table(DB_TABLE, ['#likes', 'time'])
-db.insert(DB_TABLE, (DB_TABLE1, likes, CURRENT_TIME), norepeat={'likes': likes}, where={'name': DB_TABLE})
+db.insert(DB_TABLE, (DB_TABLE1, likes, CURRENT_TIME), norepeat={'likes': likes})
 
 
 DB_TABLE = 'fb_talking'
 db.init_table(DB_TABLE, ['#talking', 'time'])
-db.insert(DB_TABLE, (DB_TABLE, talking, CURRENT_TIME), norepeat={'talking': talking}, where={'name': DB_TABLE})
+db.insert(DB_TABLE, (DB_TABLE, talking, CURRENT_TIME), norepeat={'talking': talking})
 
 
 db.save()
