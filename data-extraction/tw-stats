@@ -28,8 +28,8 @@ is_error = False
 done = False
 
 db = StatsDB(DB_FILE)
-db.init_table('tw_followers', ['#followers', 'time'])
-db.init_table('tw_statuses', ['#statuses', 'time'])
+db.init_table('tw_followers', ['name','#followers', 'time'])
+db.init_table('tw_statuses', ['name','#statuses', 'time'])
 
 while not done:
     try:
