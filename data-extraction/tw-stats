@@ -42,15 +42,14 @@ while not done:
         print 'error: waiting for 60 seconds'
         sleep(60)
     else:
-        DB_TABLE = 'twitter'
-        
+
         followers = response['followers_count']
-        name = 'tw_followers'
-        db.insert(DB_TABLE, (name, followers, CURRENT_TIME), norepeat={'followers': followers}, where={'name': name})
+        DB_TABLE = 'tw_followers'
+        db.insert(DB_TABLE, (DB_TABLE, followers, CURRENT_TIME), norepeat={'followers': followers})
         
         statuses = response['statuses_count']
-        name = 'tw_statuses'
-        db.insert(DB_TABLE, (name, followers, CURRENT_TIME), norepeat={'statuses': statuses}, where={'name': name})
+        DB_TABLE = 'tw_statuses'
+        db.insert(DB_TABLE, (DB_TABLE, followers, CURRENT_TIME), norepeat={'statuses': statuses})
         
         done = True
 
