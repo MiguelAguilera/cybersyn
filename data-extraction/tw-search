@@ -1,0 +1,136 @@
+#!/usr/bin/env python
+
+import oauth2 as oauth
+import json
+import time
+from datetime import datetime, timedelta
+import csv
+
+keys_file='data-extraction/tw.keys'
+conf_file='data-extraction/tw-search.conf'
+ 
+ 
+
+
+with open(keys_file) as f:
+    CONSUMER_KEY = f.readline().strip("\n")
+    CONSUMER_SECRET = f.readline().strip("\n")
+    ACCESS_KEY = f.readline().strip("\n")
+    ACCESS_SECRET = f.readline().strip("\n")
+    
+#with open(conf_file) as f:
+#	account = f.readline().strip("\n")	
+#	min_id = f.readline().strip("\n")
+	
+account = []
+min_id = []
+with open(conf_file, 'rb') as fconf:
+	conf = csv.reader(fconf, delimiter=' ', quotechar='|')
+	for row in conf:
+		if len(row)==2:
+			print row
+			account = account + [row[0]]
+			min_id = min_id + [int(row[1])]
+
+
+
+for i in range(len(account)):
+
+	OUTPUT='data/tw-search/'+account[i]+'.csv'
+	consumer = oauth.Consumer(key=CONSUMER_KEY, secret=CONSUMER_SECRET)
+	access_token = oauth.Token(key=ACCESS_KEY, secret=ACCESS_SECRET)
+	twitter = oauth.Client(consumer, access_token)
+
+
+	limit_rate_limit = False
+
+	done = False
+	count = 0
+	max_id=0
+	top_id=min_id[i]
+
+	if min_id[i]==0:
+		fo=open(OUTPUT, 'w')
+	else:
+		fo=open(OUTPUT,'a')
+
+	while not done:
+
+	#	Check search limits
+		check_limit_status = 0
+		url = 'https://api.twitter.com/1.1/application/rate_limit_status.json?resources=search'
+		response, data = twitter.request(url)
+		check_limit_status = int(response['status'])
+		while check_limit_status != 200:
+			response, data = twitter.request(url)
+			check_limit_status = int(response['status'])
+			print 'Response code: '+str(check_limit_status)
+			print 'check limit exceeded: waiting for 60 seconds'
+			time.sleep(60)
+
+	
+		search_limit = json.loads(data)
+		limit = int(search_limit['resources']['search']['/search/tweets']['remaining'])
+#		print limit
+	
+		if limit < 10:
+			print 'Response code: '+str(limit)
+			print 'search limit exceeded: waiting for 60 seconds'
+			time.sleep(60)
+		else:
+	
+		#	Extract tweets
+			if(max_id == 0):
+				url = 'https://api.twitter.com/1.1/search/tweets.json?q=@'+account[i]+'&result_type=recent&count=100'
+			else:
+				url = 'https://api.twitter.com/1.1/search/tweets.json?q=@'+account[i]+'&result_type=recent&count=100&max_id='+str(max_id-1)
+
+			response, data = twitter.request(url)
+			tweets = json.loads(data)
+
+			search_status = int(response['status'])
+		
+			while search_status != 200:
+				response, data = twitter.request(url)
+				search_status = int(response['status'])
+				tweets = json.loads(data)
+				print 'Response code: '+str(search_status)
+				print 'search limit exceeded: waiting for 60 seconds'
+				time.sleep(60)
+			
+			N = len(tweets['statuses'])
+			if N ==0:
+				done = True
+			else:
+				#print tweets['statuses'][N-1]['id_str']
+				count = count + N
+				ids = [];
+				for tweet in tweets['statuses']:
+					if tweet['id']>min_id[i]:
+						ids = ids + [tweet['id']]
+						# add one hour to datetime to shift from utc to time in Spain
+						tweetdate = datetime.strptime(tweet['created_at'], '%a %b %d %H:%M:%S +0000 %Y') + timedelta(hours=1)
+						fo.write('Partido_X,' + tweet['user']['screen_name'] + ',' + tweet['id_str'] + ',' + tweetdate.strftime("%Y-%m-%d %H:%M:%S")+'\n')
+					else:
+						if len(ids)>0:
+							top_id=max(ids)
+						done = True
+				if len(ids)>0:
+					max_id = min(ids)
+					if top_id==min_id[i]:
+						top_id=max(ids)
+				print account[i]
+				print count
+
+
+
+
+	print top_id
+	min_id[i]=top_id
+
+
+fconf=open(conf_file, 'w+')
+for i in range(len(account)):
+	fconf.write(account[i]+' '+str(min_id[i])+'\n')
+	
+
