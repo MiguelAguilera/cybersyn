@@ -6,7 +6,7 @@ import time
 from datetime import datetime, timedelta
 import csv
 
-keys_file='data-extraction/tw.keys'
+keys_file='data-extraction/twitter.keys'
 conf_file='data-extraction/tw-search.conf'
  
  
