@@ -28,8 +28,8 @@ is_error = False
 done = False
 
 db = StatsDB(DB_FILE)
-db.init_table('tw_followers', ['#followers', 'time'])
-db.init_table('tw_statuses', ['#statuses', 'time'])
+db.init_table('tw_followers', ['name','#followers', 'time'])
+db.init_table('tw_statuses', ['name','#statuses', 'time'])
 
 while not done:
     try:
@@ -42,10 +42,15 @@ while not done:
         print 'error: waiting for 60 seconds'
         sleep(60)
     else:
+
         followers = response['followers_count']
+        DB_TABLE = 'tw_followers'
+        db.insert(DB_TABLE, (DB_TABLE, followers, CURRENT_TIME), norepeat={'followers': followers})
+        
         statuses = response['statuses_count']
-        db.insert('tw_followers', (followers, CURRENT_TIME), norepeat={'followers': followers})
-        db.insert('tw_statuses', (statuses, CURRENT_TIME), norepeat={'statuses': statuses})
+        DB_TABLE = 'tw_statuses'
+        db.insert(DB_TABLE, (DB_TABLE, statuses, CURRENT_TIME), norepeat={'statuses': statuses})
+        
         done = True
 
 db.save()
