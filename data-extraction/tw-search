@@ -5,6 +5,7 @@ import json
 import time
 from datetime import datetime, timedelta
 import csv
+import codecs
 
 keys_file='data-extraction/twitter.keys'
 conf_file='data-extraction/tw-search.conf'
@@ -43,16 +44,17 @@ for i in range(len(account)):
 
 
 	limit_rate_limit = False
-
 	done = False
 	count = 0
 	max_id=0
 	top_id=min_id[i]
 
 	if min_id[i]==0:
-		fo=open(OUTPUT, 'w')
+		fo = codecs.open(OUTPUT, encoding='utf-8', mode='w')
+#		fo=open(OUTPUT, 'w')
 	else:
-		fo=open(OUTPUT,'a')
+		fo = codecs.open(OUTPUT, encoding='utf-8', mode='a')
+#		fo=open(OUTPUT,'a')
 
 	while not done:
 
@@ -110,13 +112,18 @@ for i in range(len(account)):
 						ids = ids + [tweet['id']]
 						# add one hour to datetime to shift from utc to time in Spain
 						tweetdate = datetime.strptime(tweet['created_at'], '%a %b %d %H:%M:%S +0000 %Y') + timedelta(hours=1)
-						fo.write('Partido_X,' + tweet['user']['screen_name'] + ',' + tweet['id_str'] + ',' + tweetdate.strftime("%Y-%m-%d %H:%M:%S")+'\n')
+						
+						fo.write('Partido_X,' + tweet['user']['screen_name'] + ',' + tweet['id_str'] + ','
+						 + tweetdate.strftime("%Y-%m-%d %H:%M:%S") + ',' +'|' + tweet['text']+'|'+'\n')
+						 
+						
+					 
 					else:
 						if len(ids)>0:
 							top_id=max(ids)
 						done = True
 				if len(ids)>0:
-					max_id = min(ids)
+					max_id = min(ids)	
 					if top_id==min_id[i]:
 						top_id=max(ids)
 				print account[i]
