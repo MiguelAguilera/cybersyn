@@ -11,24 +11,28 @@ if len(argv) < 2:
     exit(1)
 
 DB_FILE = argv[1]
-URL = 'http://graph.facebook.com/473881175964178'
 CURRENT_TIME = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+URLS_FILE = 'facebook.urls'
 
-content = loads(urlopen(URL).read())
+urls = [line.strip() for line in open(URLS_FILE)]
 
-likes = content['likes']
-talking = content['talking_about_count']
+for url in urls:
+    content = loads(urlopen(url).read())
 
-db = StatsDB(DB_FILE)
+    name = content['username']
+    likes = content['likes']
+    talking = content['talking_about_count']
 
-DB_TABLE = 'fb_likes'
-db.init_table(DB_TABLE, ['name','#likes', 'time'])
-db.insert(DB_TABLE, (DB_TABLE, likes, CURRENT_TIME), norepeat={'likes': likes})
+    db = StatsDB(DB_FILE)
+
+    DB_TABLE = 'fb_likes'
+    db.init_table(DB_TABLE, ['name', '#likes', 'time'])
+    db.insert(DB_TABLE, (name, likes, CURRENT_TIME), norepeat={'likes': likes})
 
 
-DB_TABLE = 'fb_talking'
-db.init_table(DB_TABLE, ['name','#talking', 'time'])
-db.insert(DB_TABLE, (DB_TABLE, talking, CURRENT_TIME), norepeat={'talking': talking})
+    DB_TABLE = 'fb_talking'
+    db.init_table(DB_TABLE, ['name', '#talking', 'time'])
+    db.insert(DB_TABLE, (name, talking, CURRENT_TIME), norepeat={'talking': talking})
 
 
 db.save()
