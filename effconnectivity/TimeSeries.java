@@ -7,22 +7,24 @@ public class TimeSeries
 {
 
 	public ArrayList<Double> X = new ArrayList<Double> ();
+	public String name;
 	
-	public TimeSeries(String File1, boolean Log)  {
-		X=LoadData(File1, Log);
+	public TimeSeries(File f1, boolean Log)  {
+		X=LoadData(f1, Log);
 	}
 
 
 
-	private ArrayList<Double> LoadData(String FileName, boolean Log) {  
+	private ArrayList<Double> LoadData(File f, boolean Log) {  
 	   
 		ArrayList<Double> x1 = new ArrayList<Double>();
 		try {
             
-			File f = new File(FileName);
+//			File f = new File(FileName);
 			Scanner in = new Scanner(f); 
 
-	   		
+	   		in.useDelimiter("\\n");
+		    name = in.next();
 			int i = 0;
 			double xi;
            	while (in.hasNextDouble()) {

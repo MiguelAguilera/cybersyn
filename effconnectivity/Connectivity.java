@@ -1,4 +1,3 @@
-
 package effconnectivity;
 
 import java.util.*;
@@ -7,9 +6,7 @@ import java.io.*;
 public class Connectivity 
 {
 
-	
-	
-	
+
 	public static void main(String[] args) {
 
 		int mode = 0;
@@ -38,74 +35,73 @@ public class Connectivity
 				System.exit(1);
 			}
 		}
-
-		int Nmin = 20;
 		
-		long Tspan = 3600*24*30*1;
-		int sampling = 3600*6;
+		boolean Log=true;
 		
-
-		Forum foro = new Forum("data/forum/forums.csv",sampling,Nmin,Tspan);	
-				
-		ArrayList<Integer> nums = foro.indsF_written;
+		ArrayList<File> fileNames = new ArrayList<File> ();
+		ArrayList<TimeSeries> Series = new ArrayList<TimeSeries> ();
+		String s1;
 		
-		ArrayList<String> Forums = foro.namesF_written;
-
-				
-
-			int Nf = nums.size();
-
-			double[][] A = new double[Nf][Nf];
-		
-			int num1, num2;
-		
-			for (int i=0;i<Nf;i++) {
-				num1=nums.get(i);
-				System.out.print(";");
-				System.out.print(Forums.get(i));
-			}
-			System.out.println();	
-				
-		
-			for (int i=0;i<Nf;i++) {
-				num1=nums.get(i);
-				System.out.print(Forums.get(i));	
-	//			System.out.print(";");
-			
-				for (int j=0;j<Nf;j++) {
-
-					num2=nums.get(j);
-
-		
-					String File1 = "data/forum/" + Integer.toString(num1) + ".txt";
-					String File2 = "data/forum/" + Integer.toString(num2) + ".txt";
-					 
-
-					boolean Log=true;
-
-					TimeSeries X1= new TimeSeries(File1,Log);
-					TimeSeries X2= new TimeSeries(File2,Log);
-				
-				
-        switch (mode) {
-            case 1:  // Cross correlation 
-            		 Xcorr Xc = new Xcorr(X1.X, X2.X);
-					 A[i][j]=Xc.X.get((Xc.X.size()-1)/2);
-                     break;
-            case 2:  // MutualInformation
-					 A[i][j]=MutualInformation.get(X1, X2,bins,shifts);
-                     break;
-            case 3:  // Transfer Entropy
-					 TransferEntropy TransfEnt = new TransferEntropy(X1, X2, bins,shifts,m);
-					 A[i][j]=TransferEntropy.get(X1, X2, bins,shifts,m);
-                     break;
-            default: System.err.println("Arguments" + " must correspond to any of the following options");
-            		 System.err.println("1: Functional connectivity: cross-correlation");
-            		 System.err.println("2: Functional connectivity: mutual information");
-            		 System.err.println("3: Effective connectivity: transfer entropy");
-					 System.exit(1);
-                     break;
+		try {	
+			File f = new File("effconnectivity/data/files");
+			Scanner in = new Scanner(f);
+			in.useDelimiter("\\n");
+			while (in.hasNext()) {
+				fileNames.add(new File("effconnectivity/data/"+in.next()));
+		    }
+		    
+		} catch (FileNotFoundException e) {
+            System.out.println("Fichero no existe");
+		} catch (IOException e) {
+            System.out.println("Error I/O");
+		}
+        
+        TimeSeries x1;
+        for (File fileName:fileNames) {
+        	Series.add(new TimeSeries(fileName,Log));
         }
+
+		int Nf = Series.size();
+
+		double[][] A = new double[Nf][Nf];
+		
+		int num1, num2;	
+			
+		for (TimeSeries serie:Series) {
+			System.out.print(";");
+			System.out.print(serie.name);			
+		}
+		System.out.println();		
+		
+		for (int i=0;i<Nf;i++) {
+			System.out.print(Series.get(i).name);
+			
+			for (int j=0;j<Nf;j++) {
+
+
+			TimeSeries X1 = Series.get(i);
+			TimeSeries X2 = Series.get(j);
+				
+				
+		    switch (mode) {
+		        case 1:  // Cross correlation 
+		        		 Xcorr Xc = new Xcorr(X1.X, X2.X);
+						 A[i][j]=Xc.X.get((Xc.X.size()-1)/2);
+		                 break;
+		        case 2:  // MutualInformation
+						 A[i][j]=MutualInformation.get(X1, X2,bins,shifts);
+		                 break;
+		        case 3:  // Transfer Entropy
+						 TransferEntropy TransfEnt = new TransferEntropy(X1, X2, bins,shifts,m);
+						 A[i][j]=TransferEntropy.get(X1, X2, bins,shifts,m);
+		                 break;
+		        default: System.err.println("Arguments" + " must correspond to any of the following options");
+		        		 System.err.println("1: Functional connectivity: cross-correlation");
+		        		 System.err.println("2: Functional connectivity: mutual information");
+		        		 System.err.println("3: Effective connectivity: transfer entropy");
+						 System.exit(1);
+		                 break;
+		    }
 					
 					
 					System.out.print(";");
@@ -117,9 +113,6 @@ public class Connectivity
 				}
 				System.out.println();
 			
-			
-			
-
 			}
 		
 
