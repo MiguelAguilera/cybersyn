@@ -11,9 +11,8 @@ Tspan = 3600*24*30*1;
 sampling = 3600*6;
 
 
-forum_file='data/forum/forums.csv'
+forum_file='data/stats/pad_lines.csv'
 
-forum_ids=[]
 forum_names=[]
 
 with open(forum_file, 'rb') as fconf:
@@ -25,7 +24,7 @@ with open(forum_file, 'rb') as fconf:
 with open(forum_file, 'rb') as fconf:      
         data = csv.reader(fconf, delimiter=',', quotechar='\'')
         for row in data:
-        	timestamps[forum_names.index(row[0])] = timestamps[forum_names.index(row[0])] + [datetime.strptime(row[4], "%Y-%m-%d %H:%M:%S")]
+        	timestamps[forum_names.index(row[0])] = timestamps[forum_names.index(row[0])] + [datetime.strptime(row[2], "%Y-%m-%d %H:%M:%S")]
 
 
 maxTimeStamp = float(time.strftime("%s"))
@@ -40,8 +39,8 @@ for t in timestamps:
 		for t1 in t:
 			indT=int(math.ceil((float(t1.strftime("%s"))-minTimeStamp+1)/sampling))
 			x[indT]+= 1
-		fo = codecs.open('effconnectivity/data/f'+str(ind)+'.txt', mode='w')
-		fo.write('\'[foro] '+forum_names[ind]+'\'' +'\n')
+		fo = codecs.open('effconnectivity/data/s'+str(ind)+'.txt', mode='w')
+		fo.write('\'[pad] '+forum_names[ind]+'\'' +'\n')
 		for x1 in x:
 			fo.write(str(x1) +'\n')
 		fo.close()
