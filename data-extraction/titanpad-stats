@@ -10,6 +10,7 @@ import tempfile
 from datetime import datetime
 from sys import argv
 from sys import version_info
+from glob import glob
 from statsdb import StatsDB
 
 DOMAIN = 'titanpad.com'
@@ -77,7 +78,9 @@ def pad_lines(name, pad, user, password):
     browser.retrieve(base_url + PADS_URL, zipfilename)
     unzip(zipfilename)
 
-    num_lines = os.popen('html2text *.html | wc -l', 'r').read()
+    num_lines = 0
+    for html in glob('*.html'):
+        num_lines += len(os.popen("html2text '" + html + "'", 'r').readlines())
 
     os.chdir(cwd)
     os.system('rm -rf ' + tmpdir)
