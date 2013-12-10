@@ -80,7 +80,8 @@ def pad_lines(name, pad, user, password):
 
     num_lines = 0
     for html in glob('*.html'):
-        num_lines += len(os.popen("html2text '" + html + "'", 'r').readlines())
+        os.rename(html, 'tmp.html')
+        num_lines += len(os.popen('html2text tmp.html', 'r').readlines())
 
     os.chdir(cwd)
     os.system('rm -rf ' + tmpdir)
