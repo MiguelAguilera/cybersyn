@@ -1,0 +1,50 @@
+#!/usr/bin/env python
+
+import csv
+import codecs
+import time
+from datetime import datetime
+import math
+
+
+
+Nmin = 10;
+Tspan = 3600*24*30*1;
+sampling = 3600*1;
+
+
+forum_file='data/forum/forums.csv'
+
+names=[]
+
+with open(forum_file, 'rb') as fconf:
+        data = csv.reader(fconf, delimiter=',', quotechar='\'')
+        for row in data:
+        	if not row[0] in names:
+       			names=names+[row[3]]
+       	timestamps = [ [] for i in range(len(names)) ]
+with open(forum_file, 'rb') as fconf:      
+        data = csv.reader(fconf, delimiter=',', quotechar='\'')
+        for row in data:
+        	timestamps[names.index(row[3])] = timestamps[names.index(row[3])] + [datetime.strptime(row[4], "%Y-%m-%d %H:%M:%S")]
+
+
+maxTimeStamp = float(time.strftime("%s"))
+minTimeStamp = maxTimeStamp - Tspan
+N = int(math.ceil((maxTimeStamp-minTimeStamp+1)/sampling))
+
+
+ind = 0;
+for t in timestamps:
+	if len(t)>Nmin:
+		x = [0] * N
+		for t1 in t:
+			indT=int(math.ceil((float(t1.strftime("%s"))-minTimeStamp+1)/sampling))
+			x[indT]+= 1
+		fo = codecs.open('effconnectivity/data/f'+str(ind)+'.txt', mode='w')
+		fo.write('[foro] '+names[ind] +'\n')
+		for x1 in x:
+			fo.write(str(x1) +'\n')
+		fo.close()
+	ind +=1
+	
