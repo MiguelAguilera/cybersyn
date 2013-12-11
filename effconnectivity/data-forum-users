@@ -42,7 +42,7 @@ for t in timestamps:
 			indT=int(math.ceil((float(t1.strftime("%s"))-minTimeStamp+1)/sampling))
 			x[indT]+= 1
 		fo = codecs.open('effconnectivity/data/f'+str(ind)+'.txt', mode='w')
-		fo.write('[foro] '+names[ind] +'\n')
+		fo.write('user '+names[ind] +'\n')
 		for x1 in x:
 			fo.write(str(x1) +'\n')
 		fo.close()
