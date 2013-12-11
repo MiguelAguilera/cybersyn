@@ -9,7 +9,7 @@ import math
 
 
 Nmin = 10;
-Tspan = 3600*24*30*1;
+Tspan = 3600*24*30*2;
 sampling = 3600*1;
 
 
