@@ -1,5 +1,5 @@
 
-
+rm effconnectivity/data/*
 effconnectivity/data-forum
 effconnectivity/data-stats
 cd effconnectivity/data/
