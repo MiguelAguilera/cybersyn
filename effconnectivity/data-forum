@@ -6,9 +6,11 @@ import time
 from datetime import datetime
 import math
 
+
+
 Nmin = 20;
 Tspan = 3600*24*30*1;
-sampling = 3600*6;
+sampling = 3600*1;
 
 
 forum_file='data/forum/forums.csv'
@@ -41,8 +43,9 @@ for t in timestamps:
 			indT=int(math.ceil((float(t1.strftime("%s"))-minTimeStamp+1)/sampling))
 			x[indT]+= 1
 		fo = codecs.open('effconnectivity/data/f'+str(ind)+'.txt', mode='w')
-		fo.write('\'[foro] '+forum_names[ind]+'\'' +'\n')
+		fo.write('[foro] '+forum_names[ind] +'\n')
 		for x1 in x:
 			fo.write(str(x1) +'\n')
 		fo.close()
 	ind +=1
+	

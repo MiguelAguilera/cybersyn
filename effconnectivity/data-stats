@@ -6,30 +6,43 @@ import time
 from datetime import datetime
 import math
 
+
+
 Nmin = 20;
 Tspan = 3600*24*30*1;
-sampling = 3600*6;
+sampling = 3600*1;
 
 
-forum_file='data/stats/pad_lines.csv'
+file_name='data/stats/pad_lines.csv'
 
-forum_names=[]
+names=[]
 
-with open(forum_file, 'rb') as fconf:
+with open(file_name, 'rb') as fconf:
         data = csv.reader(fconf, delimiter=',', quotechar='\'')
         for row in data:
-        	if not row[0] in forum_names:
-       			forum_names=forum_names+[row[0]]
-       	timestamps = [ [] for i in range(len(forum_names)) ]
-with open(forum_file, 'rb') as fconf:      
+        	if not row[0] in names:
+       			names=names+[row[0]]
+       	timestamps = [ [] for i in range(len(names)) ]
+       	tnum = [ [] for i in range(len(names)) ]
+with open(file_name, 'rb') as fconf:      
         data = csv.reader(fconf, delimiter=',', quotechar='\'')
         for row in data:
-        	timestamps[forum_names.index(row[0])] = timestamps[forum_names.index(row[0])] + [datetime.strptime(row[2], "%Y-%m-%d %H:%M:%S")]
-
+        	timestamps[names.index(row[0])] = timestamps[names.index(row[0])] + [[datetime.strptime(row[2], "%Y-%m-%d %H:%M:%S"),int(row[1])]]
+        	
+for t in timestamps:
+	for i in xrange(len(t)-1, 0, -1):
+		if (t[i][1]-t[i-1][1])>0:
+			t[i][1]=t[i][1]-t[i-1][1]
+		else:
+			t[i][1]=0
+		
+#    	x = sequence[i]
+#    	print x  do something with x
 
 maxTimeStamp = float(time.strftime("%s"))
 minTimeStamp = maxTimeStamp - Tspan
 N = int(math.ceil((maxTimeStamp-minTimeStamp+1)/sampling))
+
 
 
 ind = 0;
@@ -37,10 +50,10 @@ for t in timestamps:
 	if len(t)>Nmin:
 		x = [0] * N
 		for t1 in t:
-			indT=int(math.ceil((float(t1.strftime("%s"))-minTimeStamp+1)/sampling))
-			x[indT]+= 1
+			indT=int(math.ceil((float(t1[0].strftime("%s"))-minTimeStamp+1)/sampling))
+			x[indT]+= t1[1] 
 		fo = codecs.open('effconnectivity/data/s'+str(ind)+'.txt', mode='w')
-		fo.write('\'[pad] '+forum_names[ind]+'\'' +'\n')
+		fo.write('[pad] '+names[ind] +'\n')
 		for x1 in x:
 			fo.write(str(x1) +'\n')
 		fo.close()
