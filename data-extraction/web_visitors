@@ -1,0 +1,52 @@
+#!/usr/bin/env python
+# Modified from: (CC-by) 2010 Copyleft Michal Karzynski, GenomikaStudio.com 
+import datetime
+import gdata.analytics.client
+import gdata.sample_util
+from sys import argv
+from statsdb import StatsDB
+
+if len(argv) < 2:
+    print "Usage: " + argv[0] + " <dbfile>"
+    exit(1)
+    
+DB_FILE = argv[1]
+CURRENT_TIME = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+conf_file='data-extraction/ganalytics.conf'
+
+with open(conf_file) as f:
+    email = f.readline().strip("\n")
+    password = f.readline().strip("\n")
+    table_id1 = f.readline().strip("\n")
+
+
+SOURCE_APP_NAME = 'Genomika-Google-Analytics-Quick-Client-v1'
+client = gdata.analytics.client.AnalyticsClient(source=SOURCE_APP_NAME)
+client.client_login(email, password, source=SOURCE_APP_NAME, service=client.auth_service)
+
+today = datetime.date.today()
+
+
+print "Visitors yesterday"
+
+data_query = gdata.analytics.client.DataFeedQuery({
+	'ids': table_id1,
+	'start-date': today.isoformat(),
+	'end-date': today.isoformat(),
+	'dimensions': 'ga:date',
+	'metrics': 'ga:visitors'})
+feed = client.GetDataFeed(data_query)
+print "%s : %s" % (feed.data_source[0].table_name.text, feed.entry[0].metric[0].value)
+    
+visitors = int(feed.entry[0].metric[0].value)
+    
+    
+db = StatsDB(DB_FILE)
+DB_TABLE = 'web_visitors'
+db.init_table(DB_TABLE, ['name', '#visitors', 'time'])
+db.insert(DB_TABLE, ('partidox.org', visitors, CURRENT_TIME))
+
+db.save()
+ 
+
