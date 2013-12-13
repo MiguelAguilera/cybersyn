@@ -28,8 +28,6 @@ client.client_login(email, password, source=SOURCE_APP_NAME, service=client.auth
 today = datetime.date.today()
 
 
-print "Visitors yesterday"
-
 data_query = gdata.analytics.client.DataFeedQuery({
 	'ids': table_id1,
 	'start-date': today.isoformat(),
