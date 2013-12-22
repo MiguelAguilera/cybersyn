@@ -1,0 +1,57 @@
+#!/usr/bin/python
+
+import imaplib
+import email
+import time
+import re
+from sys import argv
+from datetime import datetime
+from statsdb import StatsDB
+
+ACCOUNT_FILE = 'mail.account'
+
+if len(argv) < 2:
+    print "Usage: " + argv[0] + " <dbfile>"
+    exit(1)
+
+DB_FILE = argv[1]
+
+with open(ACCOUNT_FILE) as f:
+    SERVER = f.readline().strip("\n")
+    EMAIL = f.readline().strip("\n")
+    PASSWORD = f.readline().strip("\n")
+
+mail = imaplib.IMAP4_SSL(SERVER)
+mail.login(EMAIL, PASSWORD)
+mail.select()
+result, data = mail.search(None, 'ALL')
+
+subject_regex = re.compile("\[(.+)\] (.+)")
+
+db = StatsDB(DB_FILE)
+DB_TABLE = 'mail_lists'
+db.init_table(DB_TABLE, ['name', 'subject', 'email', 'time'])
+
+for num in data[0].split():
+    _, data = mail.fetch(num, '(BODY[HEADER.FIELDS (SUBJECT FROM DATE)])')
+    headers_data = data[0][1]
+    headers = email.message_from_string(headers_data)
+    timestamp = time.mktime(email.utils.parsedate(headers['Date']))
+    date = datetime.fromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S")
+    sender = email.utils.parseaddr(headers['From'])[1]
+    subject = headers['Subject']
+    mail_list = ''
+    match = subject_regex.match(subject)
+    if match:
+        mail_list = match.group(1)
+        subject = match.group(2)
+    else:
+        continue
+
+    db.insert(DB_TABLE, (mail_list, subject, sender, date))
+
+db.save()
+
+mail.close()
+mail.logout()
+
