@@ -8,7 +8,7 @@ from sys import argv
 from datetime import datetime
 from statsdb import StatsDB
 
-ACCOUNT_FILE = 'data-extraction/mail.account'
+ACCOUNT_FILE = 'mail.account'
 
 if len(argv) < 2:
     print "Usage: " + argv[0] + " <dbfile>"
