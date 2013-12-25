@@ -11,9 +11,13 @@ from statsdb import StatsDB
 
 ACCOUNT_FILE = 'mail.account'
 
+filter_mode = '(UNSEEN)'
+
 if len(argv) < 2:
-    print "Usage: " + argv[0] + " <dbfile>"
+    print "Usage: " + argv[0] + " <dbfile> [all]"
     exit(1)
+elif len(argv) > 2:
+    filter_mode = 'ALL'
 
 DB_FILE = argv[1]
 
@@ -25,7 +29,7 @@ with open(ACCOUNT_FILE) as f:
 mail = imaplib.IMAP4_SSL(SERVER)
 mail.login(EMAIL, PASSWORD)
 mail.select()
-result, data = mail.search(None, '(UNSEEN)')
+result, data = mail.search(None, filter_mode)
 
 subject_regex = re.compile("\[(.+)\] (.+)")
 
