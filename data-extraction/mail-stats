@@ -25,7 +25,7 @@ with open(ACCOUNT_FILE) as f:
 mail = imaplib.IMAP4_SSL(SERVER)
 mail.login(EMAIL, PASSWORD)
 mail.select()
-result, data = mail.search(None, 'ALL')
+result, data = mail.search(None, '(UNSEEN)')
 
 subject_regex = re.compile("\[(.+)\] (.+)")
 
