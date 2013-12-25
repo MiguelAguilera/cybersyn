@@ -6,6 +6,7 @@ import time
 import re
 from sys import argv
 from datetime import datetime
+from email.header import decode_header
 from statsdb import StatsDB
 
 ACCOUNT_FILE = 'mail.account'
@@ -39,7 +40,9 @@ for num in data[0].split():
     timestamp = time.mktime(email.utils.parsedate(headers['Date']))
     date = datetime.fromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S")
     sender = email.utils.parseaddr(headers['From'])[1]
-    subject = headers['Subject']
+    subject, encoding = decode_header(headers['Subject'])[0]
+    if encoding:
+        subject = subject.decode(encoding)
     mail_list = ''
     match = subject_regex.match(subject)
     if match:
