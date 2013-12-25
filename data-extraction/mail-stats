@@ -31,7 +31,7 @@ mail.login(EMAIL, PASSWORD)
 mail.select()
 result, data = mail.search(None, filter_mode)
 
-subject_regex = re.compile("\[(.+)\] (.+)")
+subject_regex = re.compile("\[([^\[]+)\] (.+)")
 
 db = StatsDB(DB_FILE)
 DB_TABLE = 'mail_lists'
