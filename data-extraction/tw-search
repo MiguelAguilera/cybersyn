@@ -113,7 +113,7 @@ for i in range(len(account)):
 						# add one hour to datetime to shift from utc to time in Spain
 						tweetdate = datetime.strptime(tweet['created_at'], '%a %b %d %H:%M:%S +0000 %Y') + timedelta(hours=1)
 						
-						fo.write('Partido_X,' + tweet['user']['screen_name'] + ',' + tweet['id_str'] + ','
+						fo.write(account[i]+',' + tweet['user']['screen_name'] + ',' + tweet['id_str'] + ','
 						 + tweetdate.strftime("%Y-%m-%d %H:%M:%S") + ',' +'|' + tweet['text']+'|'+'\n')
 						 
 						
