@@ -6,13 +6,18 @@ import time
 import re
 from sys import argv
 from datetime import datetime
+from email.header import decode_header
 from statsdb import StatsDB
 
 ACCOUNT_FILE = 'mail.account'
 
+filter_mode = '(UNSEEN)'
+
 if len(argv) < 2:
-    print "Usage: " + argv[0] + " <dbfile>"
+    print "Usage: " + argv[0] + " <dbfile> [all]"
     exit(1)
+elif len(argv) > 2:
+    filter_mode = 'ALL'
 
 DB_FILE = argv[1]
 
@@ -24,9 +29,9 @@ with open(ACCOUNT_FILE) as f:
 mail = imaplib.IMAP4_SSL(SERVER)
 mail.login(EMAIL, PASSWORD)
 mail.select()
-result, data = mail.search(None, 'ALL')
+result, data = mail.search(None, filter_mode)
 
-subject_regex = re.compile("\[(.+)\] (.+)")
+subject_regex = re.compile("\[([^\[]+)\] (.+)")
 
 db = StatsDB(DB_FILE)
 DB_TABLE = 'mail_lists'
@@ -39,7 +44,9 @@ for num in data[0].split():
     timestamp = time.mktime(email.utils.parsedate(headers['Date']))
     date = datetime.fromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S")
     sender = email.utils.parseaddr(headers['From'])[1]
-    subject = headers['Subject']
+    subject, encoding = decode_header(headers['Subject'])[0]
+    if encoding:
+        subject = subject.decode(encoding)
     mail_list = ''
     match = subject_regex.match(subject)
     if match:
