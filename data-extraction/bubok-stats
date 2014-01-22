@@ -43,6 +43,6 @@ for url in urls:
         print "Error reading downloads from URL"
         exit(1)
 
-    db.insert(DB_TABLE, (title, downloads, CURRENT_TIME), norepeat={'downloads': downloads})
+    db.insert(DB_TABLE, (title, downloads, CURRENT_TIME))
 
 db.save()
