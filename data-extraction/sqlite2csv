@@ -2,11 +2,8 @@
 
 DB="stats.db"
 
-PATH1=$1
 
-cd $PATH1
-
-TABLE=$2
+TABLE=$1
 
 if [ -x "$TABLE" ]
 then
