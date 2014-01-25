@@ -12,7 +12,7 @@ if len(argv) < 2:
 
 DB_FILE = argv[1]
 CURRENT_TIME = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-URLS_FILE = 'bubok.urls'
+URLS_FILE = 'data-extraction/bubok.urls'
 
 urls = [line.strip() for line in open(URLS_FILE)]
 
