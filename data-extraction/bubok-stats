@@ -25,7 +25,7 @@ for url in urls:
     html = urlopen(url).read()
 
     title_regex = re.compile('<h1 itemprop="name">(.+)</h1>')
-    downloads_regex = re.compile(">Descargas:</span> ([0-9]+)")
+    downloads_regex = re.compile(">Descargas:</span> ([0-9.]+)")
 
     title = ''
     match = title_regex.search(html)
@@ -38,7 +38,7 @@ for url in urls:
     downloads = 0
     match = downloads_regex.search(html)
     if match:
-        downloads = int(match.group(1))
+        downloads = int(match.group(1).replace('.', ''))
     else:
         print "Error reading downloads from URL"
         exit(1)
