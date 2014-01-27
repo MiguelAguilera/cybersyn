@@ -1,0 +1,86 @@
+#!/usr/bin/env python
+
+
+
+from urllib2 import urlopen, URLError, HTTPError, Request
+from simplejson import loads
+import json
+import time
+ 
+def get_json(url):
+
+	read=False
+	jsonContent={}
+	while not read:
+		req = Request(url)
+		try:
+			content=urlopen(url)
+			jsonContent = loads(content.read())
+			print 'read'
+			read=True
+		except URLError as e:
+			print e
+			print 'Waiting for 30s'
+			time.sleep(30)
+		except HTTPError as e:
+			print e  
+			print 'Waiting for 30s'
+			time.sleep(30)
+	return jsonContent
+ 
+def get_users_ids(userId):
+
+	with open('fb.keys') as f:
+		FACEBOOK_APP_ID = f.readline().strip("\n")
+		FACEBOOK_APP_SECRET = f.readline().strip("\n")
+
+			
+	token_url='https://graph.facebook.com/oauth/access_token?grant_type=client_credentials&client_id='+FACEBOOK_APP_ID+'&client_secret='+FACEBOOK_APP_SECRET
+	
+	accessToken = urlopen(token_url).read()
+
+	url ='https://graph.facebook.com/'+userId+'/posts?' + accessToken + '&fields=likes'
+	print url
+	
+	jsonContent=get_json(url)
+	
+	count=0
+	cond=True
+
+	likes = set()
+	while cond:
+		for post in jsonContent['data']:
+
+			if len(post)>2:
+				for like in post['likes']['data']:
+					print like['name']
+					print like['id']
+				
+					likes.add(like ['id'])
+				
+					count+=1
+				
+#				if 'comments' in post:
+#					for comment in post['comments']['data']:
+#						print comment['from']['id']
+#						print comment['from']['id']
+#						likes.add(comment['from']['id'])
+#						count +=1
+				
+		print len(likes)
+		cond =  'paging' in jsonContent
+	
+		if cond:
+			print jsonContent['paging']['next']
+			url = jsonContent['paging']['next']
+			jsonContent=get_json(url)
+		
+	return list(likes)
+
+
+likesX = get_users_ids('473881175964178') #Partido X
+print len(likesX)
+
+
+
+
