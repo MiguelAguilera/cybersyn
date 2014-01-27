@@ -78,7 +78,7 @@ def get_users_ids(userId):
 	return list(likes)
 
 
-likesX = get_users_ids('473881175964178') #Partido X
+likesX = get_users_ids('473881175964178')
 print len(likesX)
 
 
