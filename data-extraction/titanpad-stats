@@ -63,6 +63,7 @@ def unzip(filename):
 
 def pad_lines(name, pad, user, password):
     base_url = 'http://' + pad + '.' + DOMAIN
+    print pad
     browser = mechanize.Browser()
     browser.open(base_url)
     browser.select_form(nr=0)
