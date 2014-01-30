@@ -66,26 +66,26 @@ def pad_lines(name, pad, user, password):
     base_url = 'http://' + pad + '.' + DOMAIN
     print pad
     browser = mechanize.Browser()
+    zipfilename = 'pads.zip'
 
     try:
         browser.open(base_url)
+        browser.select_form(nr=0)
+        browser.form['email'] = user
+        browser.form['password'] = password
+        browser.submit()
+
+        tmpdir = tempfile.mkdtemp()
+        cwd = os.getcwd()
+        os.chdir(tmpdir)
+
+        browser.retrieve(base_url + PADS_URL, zipfilename)
     except HTTPError, e:
         if e.code == 500:
             return -1
         else:
             raise e
 
-    browser.select_form(nr=0)
-    browser.form['email'] = user
-    browser.form['password'] = password
-    browser.submit()
-
-    tmpdir = tempfile.mkdtemp()
-    cwd = os.getcwd()
-    os.chdir(tmpdir)
-
-    zipfilename = 'pads.zip'
-    browser.retrieve(base_url + PADS_URL, zipfilename)
     unzip(zipfilename)
 
     num_lines = 0
