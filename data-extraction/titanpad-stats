@@ -12,6 +12,7 @@ from sys import argv
 from sys import version_info
 from glob import glob
 from statsdb import StatsDB
+from urllib2 import HTTPError
 
 DOMAIN = 'titanpad.com'
 PADS_URL = '/ep/padlist/all-pads.zip'
@@ -63,19 +64,28 @@ def unzip(filename):
 
 def pad_lines(name, pad, user, password):
     base_url = 'http://' + pad + '.' + DOMAIN
+    print pad
     browser = mechanize.Browser()
-    browser.open(base_url)
-    browser.select_form(nr=0)
-    browser.form['email'] = user
-    browser.form['password'] = password
-    browser.submit()
-
-    tmpdir = tempfile.mkdtemp()
-    cwd = os.getcwd()
-    os.chdir(tmpdir)
-
     zipfilename = 'pads.zip'
-    browser.retrieve(base_url + PADS_URL, zipfilename)
+
+    try:
+        browser.open(base_url)
+        browser.select_form(nr=0)
+        browser.form['email'] = user
+        browser.form['password'] = password
+        browser.submit()
+
+        tmpdir = tempfile.mkdtemp()
+        cwd = os.getcwd()
+        os.chdir(tmpdir)
+
+        browser.retrieve(base_url + PADS_URL, zipfilename)
+    except HTTPError, e:
+        if e.code == 500:
+            return -1
+        else:
+            raise e
+
     unzip(zipfilename)
 
     num_lines = 0
@@ -106,6 +116,8 @@ def update_stats_db(conf, database=DEFAULT_DATABASE):
         (name, pad, user, password) = line.split(' ')
         password = password.strip("\n")
         num_lines = pad_lines(name, pad, user, password)
+        if num_lines < 0:
+            continue
         db.insert(DB_TABLE, (name, num_lines, CURRENT_TIME), norepeat={'lines': num_lines}, where={'name': name})
 
     db.save()
