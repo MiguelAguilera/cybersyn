@@ -13,6 +13,7 @@ def get_json(url):
 	jsonContent={}
 	while not read:
 		req = Request(url)
+		count = 0
 		try:
 			content=urlopen(url)
 			jsonContent = loads(content.read())
@@ -20,27 +21,29 @@ def get_json(url):
 			read=True
 		except URLError as e:
 			print 'URLError', e
-			if e.getcode()==403:
-				print e.getcode()
+			if count >= 10:
+				print e
 				jsonContent=None
 				print 'Waiting for 300s'
 				time.sleep(300)
 				read=True
 			else:
-				print 'Waiting for 30s'
-				time.sleep(30)
+				print 'Waiting for 60s'
+				count+=1
+				time.sleep(60)
 			
 		except HTTPError as e:
 			print 'HTTPError',e			
-			if e.getcode()==403:
+			if count>=10:
 				print e.getcode()
 				jsonContent=None
 				print 'Waiting for 300s'
 				time.sleep(300)
 				read=True
 			else:
-				print 'Waiting for 300s'
-				time.sleep(300)
+				print 'Waiting for 60s'
+				count+=1
+				time.sleep(60)
 	return jsonContent
  
  
