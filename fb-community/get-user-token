@@ -1,0 +1,38 @@
+#!/usr/bin/python
+
+from selenium import webdriver
+from sys import argv
+
+def get_token(login_email, login_password):
+    driver = webdriver.PhantomJS()
+    driver.get('https://developers.facebook.com/tools/explorer')
+    driver.implicitly_wait(30)
+
+    email = driver.find_element_by_id('email')
+    email.click()
+    email.send_keys(login_email)
+    password = driver.find_element_by_id('pass')
+    password.click()
+    password.send_keys(login_password)
+    driver.find_element_by_name('login').click()
+
+    driver.find_element_by_xpath(".//input[@type='radio' and @name='name_action_selected' and contains(@value, 'dont_save')]").click()
+    driver.find_element_by_id('checkpointSubmitButton').click()
+
+    driver.find_element_by_link_text('Get Access Token').click()
+    driver.find_element_by_link_text('Extended Permissions').click()
+    checkbox = driver.find_element_by_name('read_insights')
+    if not checkbox.is_selected():
+        checkbox.click()
+
+    driver.find_element_by_xpath(".//button[contains(.,'Get Access Token')]").click()
+    element = driver.find_element_by_xpath(".//input[@id='access_token']")
+    return element.get_attribute('value')
+
+if __name__ == "__main__":
+    if len(argv) == 3:
+        token = get_token(argv[1], argv[2])
+        print "ACCESS TOKEN: " + token
+    else:
+        print "Usage: " + argv[0] + " <login> <password>"
+        exit(1)
