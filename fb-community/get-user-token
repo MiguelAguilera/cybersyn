@@ -5,7 +5,8 @@ from sys import argv
 from time import sleep
 
 def get_token(login_email, login_password):
-    driver = webdriver.PhantomJS()
+    #driver = webdriver.PhantomJS()
+    driver = webdriver.Chrome(executable_path='/usr/lib/chromium-browser/chromedriver')
     driver.get('https://developers.facebook.com/tools/explorer')
     driver.implicitly_wait(30)
 
@@ -17,8 +18,9 @@ def get_token(login_email, login_password):
     password.send_keys(login_password)
     driver.find_element_by_name('login').click()
 
-    driver.find_element_by_xpath(".//input[@type='radio' and @name='name_action_selected' and contains(@value, 'dont_save')]").click()
-    driver.find_element_by_id('checkpointSubmitButton').click()
+
+#    driver.find_element_by_xpath(".//input[@type='radio' and @name='name_action_selected' and contains(@value, 'dont_save')]").click()
+#    driver.find_element_by_id('checkpointSubmitButton').click()
 
     driver.find_element_by_link_text('Get Access Token').click()
     driver.find_element_by_link_text('Extended Permissions').click()
