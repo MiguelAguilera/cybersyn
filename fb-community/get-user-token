@@ -24,7 +24,7 @@ def get_token(login_email, login_password):
     driver.find_element_by_link_text('Get Access Token').click()
     sleep(1)
     driver.find_element_by_link_text('Extended Permissions').click()
-    driver.find_element_by_link_text('Clear').click()
+#    driver.find_element_by_link_text('Clear').click()
     driver.find_element_by_name('read_insights').click()
     driver.find_element_by_xpath(".//button[contains(.,'Get Access Token')]").click()
 
@@ -54,6 +54,9 @@ if __name__ == "__main__":
                 token = get_token(argv[1], argv[2])
                 if token:
                     print "ACCESS TOKEN: " + token
+                    f = open('fb.token','w')
+                    f.write(token)
+                    f.close()                    
                     break
                 else:
                     print "Empty token, retrying..."
