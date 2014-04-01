@@ -6,8 +6,6 @@ from random import randrange
 from twython import exceptions
 
 
-
-
 keys_file='tw.keys'
 with open(keys_file) as f:
     APP_KEY = f.readline().strip("\n")
