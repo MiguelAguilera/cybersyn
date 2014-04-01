@@ -1,0 +1,53 @@
+#!/usr/bin/python
+
+from twython import Twython
+import time
+from random import randrange
+from twython import exceptions
+
+
+
+
+keys_file='tw.keys'
+with open(keys_file) as f:
+    APP_KEY = f.readline().strip("\n")
+    APP_SECRET = f.readline().strip("\n")
+    OAUTH_TOKEN = f.readline().strip("\n")
+    OAUTH_TOKEN_SECRET = f.readline().strip("\n")
+
+def get_followers(user):
+
+	next_cursor=-1
+
+	c=[]
+	while(next_cursor):
+		try:
+		  print 'connecting'
+		  print user
+		  search = t.get_followers_ids(screen_name=user, cursor=next_cursor)
+		  c=c+search['ids']
+		  print len(c)
+		  next_cursor = search["next_cursor"]
+		  if next_cursor:
+			  print 'Waiting for 60s'
+			  time.sleep(60)
+		except exceptions.TwythonRateLimitError as e:
+			print e
+			print 'Waiting for 60s'
+			time.sleep(60)
+		except exceptions.TwythonError as e:
+			print e
+			print 'Waiting for 60s'
+			time.sleep(60)
+
+	return c
+
+
+t = Twython(APP_KEY, APP_SECRET, OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
+
+
+user_id = 'xxxx'
+f = get_followers(user_id)
+print f
+print len(f)
+
