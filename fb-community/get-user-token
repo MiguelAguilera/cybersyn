@@ -21,7 +21,7 @@ def get_token(login_email, login_password):
     driver.find_element_by_name('login').click()
     sleep(1)
 
-    driver.find_element_by_link_text('Get Access Token').click()
+    driver.find_element_by_link_text('Obtener Clave de Acceso').click()
     sleep(1)
     driver.find_element_by_link_text('Extended Permissions').click()
 #    driver.find_element_by_link_text('Clear').click()
@@ -37,7 +37,7 @@ def get_token(login_email, login_password):
 
     # Wait until popup is closed
     while (len(driver.window_handles) > 1) and (timeout > 0):
-        driver.find_element_by_xpath(".//button[contains(.,'Okay')]").click()
+        driver.find_element_by_xpath(".//button[contains(.,'Aceptar')]").click()
         sleep(0.1)
         timeout -= 1
     driver.switch_to_window(driver.window_handles[0])
