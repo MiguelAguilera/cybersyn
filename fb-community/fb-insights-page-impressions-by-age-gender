@@ -1,0 +1,114 @@
+#!/usr/bin/python
+# coding: utf-8
+
+
+from urllib2 import urlopen, URLError, HTTPError, Request
+from simplejson import loads
+import json
+import time
+import codecs
+
+def get_json(url):
+
+	read=False
+	jsonContent={}
+	while not read:
+		req = Request(url)
+		try:
+			content=urlopen(url)
+			jsonContent = loads(content.read())
+			read=True
+		except URLError as e:
+			print 'URLError', e
+			if e.getcode()==403:
+				print e.getcode()
+				jsonContent=None
+				print 'Waiting for 300s'
+				time.sleep(300)
+				read=True
+			else:
+				print 'Waiting for 30s'
+				time.sleep(30)
+			
+		except HTTPError as e:
+			print 'HTTPError',e			
+			if e.getcode()==403:
+				print e.getcode()
+				jsonContent=None
+				print 'Waiting for 300s'
+				time.sleep(300)
+				read=True
+			else:
+				print 'Waiting for 300s'
+				time.sleep(300)
+	return jsonContent
+	
+
+
+	
+with open('fb.keys') as f:
+	FACEBOOK_APP_ID = f.readline().strip("\n")
+	FACEBOOK_APP_SECRET = f.readline().strip("\n")
+
+
+with open('fb.token') as f:
+	accessToken = f.readline().strip("\n")
+
+print accessToken
+
+userId='473881175964178'
+		
+task='page_impressions_by_age_gender_unique/day'
+
+sexes=['M','F']
+ages=['18-24','25-34','35-44','45-54','55-64','65+']
+
+categories=[]
+for age in ages:
+	for sex in sexes:
+		categories=categories+[sex+'.'+age]
+print categories
+	
+
+name=task[5:-11] 
+print name
+url ='https://graph.facebook.com/'+userId+'/insights/'+task+'?access_token='+ accessToken
+
+print url
+insights=get_json(url)
+
+count =0
+
+def extract_insights(insights,categories):
+	vtext=[]
+	for ins in insights['data'][0]['values']:
+		day=ins['end_time']
+		values=[0]*len(categories)
+		for i in range(len(categories)):
+			if categories[i] in ins['value']:
+				values[i]=ins['value'][categories[i]]
+		values_str=''
+		for v in values:
+			values_str=values_str + ','+ str(v)
+		vtext=[(day+values_str+'\n').encode('utf8')]+vtext
+		
+	for text in vtext:
+		f.write(text)
+		print text[0:15]
+
+f = open('page_insights.csv','w')
+
+categories_str=''
+for cat in categories:
+	categories_str=categories_str + ','+ cat
+f.write(('date'+categories_str+'\n').encode('utf8'))
+
+extract_insights(insights,categories)
+
+while 'previous' in insights['paging']:
+	url = insights['paging']['previous']
+	insights=get_json(url)
+	count+=1
+	extract_insights(insights,categories)
+
+
