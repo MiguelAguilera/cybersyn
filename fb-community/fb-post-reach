@@ -132,7 +132,7 @@ if os.path.isfile(OUTPUT):
 	f = open(OUTPUT,'a')
 else:
 	f = open(OUTPUT,'w')
-	f.write((u'alcance, alcance (fan), alcance (no fan), %alcance (fan), %alcance (no fan), alcance (orgánico), alcance (pagado), alcance (viral), feedback negativo, clicks, clicks (otros), clicks (fotos), clicks (links), fecha'+'\n').encode('utf8'))
+	f.write((u'likes, comments, alcance, alcance (fan), alcance (no fan), %alcance (fan), %alcance (no fan), alcance (orgánico), alcance (pagado), alcance (viral), feedback negativo, clicks, clicks (otros), clicks (fotos), clicks (links), fecha'+'\n').encode('utf8'))
 	
 
 
@@ -147,7 +147,12 @@ for ins in post_insights:
 		text_insights = text_insights + str(ins)
 print 
 print text_insights
+
+comments=len(get_comments(post['id'],accessToken))
+likes=len(get_likes(post['id'],accessToken))
 datenow=datetime.now()
-f.write((text_insights+','+str(datenow)+'\n').encode('utf8'))
+
+
+f.write((str(likes)+','+str(comments)+','+text_insights+','+str(datenow)+'\n').encode('utf8'))
 
 
