@@ -146,13 +146,13 @@ for ins in post_insights:
 	else:
 		text_insights = text_insights + str(ins)
 print 
-print text_insights
+
 
 comments=len(get_comments(post_tag,accessToken))
 likes=len(get_likes(post_tag,accessToken))
 datenow=datetime.now()
 
-
+print (str(likes)+','+str(comments)+','+text_insights+','+str(datenow)+'\n').encode('utf8')
 f.write((str(likes)+','+str(comments)+','+text_insights+','+str(datenow)+'\n').encode('utf8'))
 
 
