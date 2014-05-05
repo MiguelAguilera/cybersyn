@@ -1,50 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from utils import get_json, get_access_token_from_file
 
-from urllib2 import urlopen, URLError, HTTPError
-from simplejson import loads
-import time
-
-
-def get_json(url):
-    read = False
-    jsonContent = {}
-    while not read:
-        count = 0
-        try:
-            content = urlopen(url)
-            jsonContent = loads(content.read())
-            read = True
-        except URLError as e:
-            print 'URLError', e
-            if count >= 10:
-                print e
-                jsonContent = None
-                print 'Waiting for 300s'
-                time.sleep(300)
-                read = True
-            else:
-                print 'Waiting for 60s'
-                count += 1
-                time.sleep(60)
-
-        except HTTPError as e:
-            print 'HTTPError', e
-            if count >= 10:
-                print e.getcode()
-                jsonContent = None
-                print 'Waiting for 300s'
-                time.sleep(300)
-                read = True
-            else:
-                print 'Waiting for 60s'
-                count += 1
-                time.sleep(60)
-    return jsonContent
+accessToken = ""
 
 
-def get_likes(post_id, accessToken):
+def get_likes(post_id):
     likes_url = 'https://graph.facebook.com/' + str(post_id) + '/likes?limit=200&' + accessToken
     likes = get_json(likes_url)
 
@@ -58,7 +20,7 @@ def get_likes(post_id, accessToken):
     return users
 
 
-def get_insights(post_id, accessToken):
+def get_insights(post_id):
     values = []
     tasks = [
         'post_impressions_unique/lifetime',
@@ -90,7 +52,7 @@ def get_insights(post_id, accessToken):
     return values
 
 
-def get_comments(post_id, accessToken):
+def get_comments(post_id):
     comments_url = 'https://graph.facebook.com/' + str(post_id) + '/comments?limit=200&' + accessToken
     comments = get_json(comments_url)
 
@@ -110,7 +72,7 @@ def get_comments(post_id, accessToken):
 
 
 # UNUSED
-def get_user_url(user_id, accessToken):
+def get_user_url(user_id):
     user_url = 'https://graph.facebook.com/' + str(user_id)
     print user_url
     user = get_json(user_url)
@@ -127,9 +89,6 @@ def get_page_impact(pageId):
 #       FACEBOOK_APP_SECRET = f.readline().strip("\n")
 #   token_url='https://graph.facebook.com/oauth/access_token?grant_type=client_credentials&client_id='+FACEBOOK_APP_ID+'&client_secret='+FACEBOOK_APP_SECRET
 #   accessToken = urlopen(token_url).read()
-
-    with open('fb.token') as f:
-        accessToken = 'access_token=' + f.readline().strip("\n")
 
     url = 'https://graph.facebook.com/' + pageId + '/posts?' + accessToken
     print url
@@ -149,15 +108,15 @@ def get_page_impact(pageId):
             if 'message' in post:
                 post_id = post['id']
                 print post_id
-                post_insights = get_insights(post_id, accessToken)
+                post_insights = get_insights(post_id)
                 message = '|' + post['message'] + '|'
                 if 'shares' in post:
                     shares = str(post['shares']['count'])
                 else:
                     shares = '0'
                 time = '|' + post["created_time"] + '|'
-                comments = str(len(get_comments(post_id, accessToken)))
-                likes = str(len(get_likes(post_id, accessToken)))
+                comments = str(len(get_comments(post_id)))
+                likes = str(len(get_likes(post_id)))
 
                 output_text = [post_id, message, time, likes, comments, shares] + post_insights
                 output_text = ','.join(output_text).encode('utf8') + '\n'
@@ -175,5 +134,8 @@ def get_page_impact(pageId):
 
 
 if __name__ == '__main__':
+    global accessToken
+    accessToken = get_access_token_from_file()
+
     get_page_impact('PartidoXPartidodelFuturo')  # Partido X
     return 0
