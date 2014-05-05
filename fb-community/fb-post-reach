@@ -49,6 +49,15 @@ def get_json(url):
 	return jsonContent
  
  
+def get_shares(post_id,accessToken):
+	shares_url = 'https://graph.facebook.com/'+str(post_id)+'/?fields=shares&'+ accessToken
+	post=get_json(shares_url)
+	if 'shares' in post:
+		shares=post['shares']['count']
+	else:
+		shares=0
+	return shares
+	
 def get_likes(post_id,accessToken):
 
 	users=[]
@@ -132,7 +141,7 @@ if os.path.isfile(OUTPUT):
 	f = open(OUTPUT,'a')
 else:
 	f = open(OUTPUT,'w')
-	f.write((u'likes, comments, alcance, alcance (fan), alcance (no fan), %alcance (fan), %alcance (no fan), alcance (orgánico), alcance (pagado), alcance (viral), feedback negativo, clicks, clicks (otros), clicks (fotos), clicks (links), fecha'+'\n').encode('utf8'))
+	f.write((u'likes, comments, shares, alcance, alcance (fan), alcance (no fan), %alcance (fan), %alcance (no fan), alcance (orgánico), alcance (pagado), alcance (viral), feedback negativo, clicks, clicks (otros), clicks (fotos), clicks (links), fecha'+'\n').encode('utf8'))
 	
 
 
@@ -150,9 +159,10 @@ print
 
 comments=len(get_comments(post_tag,accessToken))
 likes=len(get_likes(post_tag,accessToken))
+shares=get_shares(post_tag,accessToken)
 datenow=datetime.now()
 
-print (str(likes)+','+str(comments)+','+text_insights+','+str(datenow)+'\n').encode('utf8')
-f.write((str(likes)+','+str(comments)+','+text_insights+','+str(datenow)+'\n').encode('utf8'))
+print (str(likes)+','+str(comments)+','+str(shares)+','+text_insights+','+str(datenow)+'\n').encode('utf8')
+f.write((str(likes)+','+str(comments)+','+str(shares)+','+text_insights+','+str(datenow)+'\n').encode('utf8'))
 
 
