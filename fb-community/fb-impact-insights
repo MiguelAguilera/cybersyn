@@ -34,7 +34,11 @@ def get_insights(post_id):
         insights_url = 'https://graph.facebook.com/' + str(post_id) + '/insights/' + task + '?' + accessToken
         insights = get_json(insights_url)
         print insights
-        values += [insights['data'][0]['values'][0]['value']]
+        try:
+            values += [insights['data'][0]['values'][0]['value']]
+        except:
+            print '###### ERROR: data is empty! ########'
+            values += [0]
 
     task = 'post_consumptions_by_type_unique/lifetime'
     insights_url = 'https://graph.facebook.com/' + str(post_id) + '/insights/' + task + '?' + accessToken
@@ -138,4 +142,3 @@ if __name__ == '__main__':
     accessToken = get_access_token_from_file()
 
     get_page_impact('PartidoXPartidodelFuturo')  # Partido X
-    return 0
