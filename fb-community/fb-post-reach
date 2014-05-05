@@ -148,8 +148,8 @@ for ins in post_insights:
 print 
 print text_insights
 
-comments=len(get_comments(post['id'],accessToken))
-likes=len(get_likes(post['id'],accessToken))
+comments=len(get_comments(post_tag,accessToken))
+likes=len(get_likes(post_tag,accessToken))
 datenow=datetime.now()
 
 
