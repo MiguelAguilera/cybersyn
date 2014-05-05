@@ -21,6 +21,7 @@ def get_likes(post_id):
 
 
 def get_insights(post_id):
+    print 'Getting insights for post:', str(post_id)
     values = []
     tasks = [
         'post_impressions_unique/lifetime',
@@ -34,7 +35,7 @@ def get_insights(post_id):
         insights_url = 'https://graph.facebook.com/' + str(post_id) + '/insights/' + task + '?' + accessToken
         insights = get_json(insights_url)
         #print insights
-        print insights_url
+        print task
         try:
             values += [insights['data'][0]['values'][0]['value']]
         except:
@@ -45,7 +46,7 @@ def get_insights(post_id):
     insights_url = 'https://graph.facebook.com/' + str(post_id) + '/insights/' + task + '?' + accessToken
     insights = get_json(insights_url)
     #print insights
-    print insights_url
+    print task
 
     for typ in ["other clicks", "photo view", "link clicks"]:
         insight_values = insights['data'][0]['values'][0]['value']
@@ -123,6 +124,8 @@ def get_page_impact(pageId):
                 time = '|' + post["created_time"] + '|'
                 comments = str(len(get_comments(post_id)))
                 likes = str(len(get_likes(post_id)))
+                print time, message
+                print
 
                 output_text = [post_id, message, time, likes, comments, shares] + map(str, post_insights)
                 output_text = ','.join(output_text).encode('utf8') + '\n'
