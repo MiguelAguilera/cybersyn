@@ -122,7 +122,7 @@ def get_page_impact(pageId):
                 comments = str(len(get_comments(post_id)))
                 likes = str(len(get_likes(post_id)))
 
-                output_text = [post_id, message, time, likes, comments, shares] + post_insights
+                output_text = [post_id, message, time, likes, comments, shares] + map(str, post_insights)
                 output_text = ','.join(output_text).encode('utf8') + '\n'
                 f.write(output_text)
                 print output_text
