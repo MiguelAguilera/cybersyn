@@ -2,123 +2,118 @@
 # -*- coding: utf-8 -*-
 
 
-from urllib2 import urlopen, URLError, HTTPError, Request
+from urllib2 import urlopen, URLError, HTTPError
 from simplejson import loads
-import json
 import time
 
-def get_json(url):
 
-    read=False
-    jsonContent={}
+def get_json(url):
+    read = False
+    jsonContent = {}
     while not read:
-        req = Request(url)
         count = 0
         try:
-            content=urlopen(url)
+            content = urlopen(url)
             jsonContent = loads(content.read())
-            read=True
+            read = True
         except URLError as e:
             print 'URLError', e
             if count >= 10:
                 print e
-                jsonContent=None
+                jsonContent = None
                 print 'Waiting for 300s'
                 time.sleep(300)
-                read=True
+                read = True
             else:
                 print 'Waiting for 60s'
-                count+=1
+                count += 1
                 time.sleep(60)
 
         except HTTPError as e:
-            print 'HTTPError',e
-            if count>=10:
+            print 'HTTPError', e
+            if count >= 10:
                 print e.getcode()
-                jsonContent=None
+                jsonContent = None
                 print 'Waiting for 300s'
                 time.sleep(300)
-                read=True
+                read = True
             else:
                 print 'Waiting for 60s'
-                count+=1
+                count += 1
                 time.sleep(60)
     return jsonContent
 
 
-def get_likes(post_id,accessToken):
+def get_likes(post_id, accessToken):
+    likes_url = 'https://graph.facebook.com/' + str(post_id) + '/likes?limit=200&' + accessToken
+    likes = get_json(likes_url)
 
-    users=[]
-    likes_url = 'https://graph.facebook.com/'+str(post_id)+'/likes?limit=200&'+ accessToken
-    likes=get_json(likes_url)
+    users = []
     if len(likes['data']):
-        users=users+likes['data']
+        users += likes['data']
         while 'next' in likes['paging']:
             nextlikes_url = likes['paging']['next']
-            likes=get_json(nextlikes_url)
-            users=users+likes['data']
+            likes = get_json(nextlikes_url)
+            users += likes['data']
     return users
 
-def get_insights(post_id,accessToken):
 
-    values=[]
-
-    tasks=[
-    'post_impressions_unique/lifetime',
-    'post_impressions_fan_unique/lifetime',
-    'post_impressions_organic_unique/lifetime',
-    'post_impressions_paid_unique/lifetime',
-    'post_impressions_viral_unique/lifetime',
-    'post_negative_feedback_unique/lifetime',
-    'post_consumptions_unique/lifetime']
+def get_insights(post_id, accessToken):
+    values = []
+    tasks = [
+        'post_impressions_unique/lifetime',
+        'post_impressions_fan_unique/lifetime',
+        'post_impressions_organic_unique/lifetime',
+        'post_impressions_paid_unique/lifetime',
+        'post_impressions_viral_unique/lifetime',
+        'post_negative_feedback_unique/lifetime',
+        'post_consumptions_unique/lifetime']
     for task in tasks:
-        insights_url = 'https://graph.facebook.com/'+str(post_id)+'/insights/' +task+'?'+ accessToken
-        value = get_json(insights_url)
-        print value
-        values = values + [value['data'][0]['values'][0]['value']]
+        insights_url = 'https://graph.facebook.com/' + str(post_id) + '/insights/' + task + '?' + accessToken
+        insights = get_json(insights_url)
+        print insights
+        values += [insights['data'][0]['values'][0]['value']]
 
-    task='post_consumptions_by_type_unique/lifetime'
-    insights_url = 'https://graph.facebook.com/'+str(post_id)+'/insights/' +task+'?'+ accessToken
-
-    insights=get_json(insights_url)
+    task = 'post_consumptions_by_type_unique/lifetime'
+    insights_url = 'https://graph.facebook.com/' + str(post_id) + '/insights/' + task + '?' + accessToken
+    insights = get_json(insights_url)
     print insights
-    types=["other clicks","photo view","link clicks"]
 
-    for typ in types:
-        if typ in insights['data'][0]['values'][0]['value']:
-            values = values + [insights['data'][0]['values'][0]['value'][typ]]
+    for typ in ["other clicks", "photo view", "link clicks"]:
+        insight_values = insights['data'][0]['values'][0]['value']
+        if typ in insight_values:
+            values += [insight_values[typ]]
         else:
-            values = values + [0]
+            values += [0]
 
-    values = values[0:2] + [values[0]-values[1]] + values[2:]
-
+    values = values[0:2] + [values[0] - values[1]] + values[2:]
     return values
 
 
-def get_comments(post_id,accessToken):
+def get_comments(post_id, accessToken):
+    comments_url = 'https://graph.facebook.com/' + str(post_id) + '/comments?limit=200&' + accessToken
+    comments = get_json(comments_url)
 
-    c=[]
-    comments_url = 'https://graph.facebook.com/'+str(post_id)+'/comments?limit=200&'+ accessToken
-    comments=get_json(comments_url)
+    c = []
     if len(comments['data']):
-        c=c+comments['data']
+        c += comments['data']
         while 'next' in comments['paging']:
             nextcomments_url = comments['paging']['next']
-            comments=get_json(nextcomments_url)
-            c=c+comments['data']
+            comments = get_json(nextcomments_url)
+            c += comments['data']
 
     users = []
     for comment in c:
-        users=users+[comment['from']]
+        users += [comment['from']]
 
     return users
 
-def get_user_url(user_id,accessToken):
 
-    c=[]
-    user_url = 'https://graph.facebook.com/'+str(user_id)
+# UNUSED
+def get_user_url(user_id, accessToken):
+    user_url = 'https://graph.facebook.com/' + str(user_id)
     print user_url
-    user=get_json(user_url)
+    user = get_json(user_url)
 
     if 'link' in user:
         return user['link']
@@ -127,68 +122,58 @@ def get_user_url(user_id,accessToken):
 
 
 def get_page_impact(pageId):
-
 #   with open('fb.keys') as f:
 #       FACEBOOK_APP_ID = f.readline().strip("\n")
 #       FACEBOOK_APP_SECRET = f.readline().strip("\n")
 #   token_url='https://graph.facebook.com/oauth/access_token?grant_type=client_credentials&client_id='+FACEBOOK_APP_ID+'&client_secret='+FACEBOOK_APP_SECRET
-
 #   accessToken = urlopen(token_url).read()
 
     with open('fb.token') as f:
-        accessToken = 'access_token='+f.readline().strip("\n")
+        accessToken = 'access_token=' + f.readline().strip("\n")
 
-
-    url ='https://graph.facebook.com/'+pageId+'/posts?' + accessToken
+    url = 'https://graph.facebook.com/' + pageId + '/posts?' + accessToken
     print url
 
-    jsonContent=get_json(url)
+    jsonContent = get_json(url)
+    cond = True
 
-    count=0
-    cond=True
+    csvfile = 'post_impact_insights_' + pageId + '.csv'
+    fields = ['post_id', 'message', 'date', '#likes', '#comments', '#shares', 'Reach', 'Reach (fans)', 'Reach (no fans)', 'Reach (organic)',
+              'Reach (paid)', 'Reach (viral)', 'Negative feedback', 'Clicks', 'Clicks (otros)', 'Clicks (photos)', 'Clicks (links)']
+    fields = ','.join(fields).encode('utf8') + '\n'
 
-    f = open('post_impact_insights_'+pageId+'.csv','w')
-    fields='post_id'+','+'message'+','+'date'+','+'#likes'+','+'#comments'+','+'#shares'+',' +'Reach'+','+'Reach (fans)'+','+'Reach (no fans)'+','+'Reach (organic)'+','+'Reach (paid)'+','+'Reach (viral)'+','+'Negative feedback'+','+'Clicks'+','+'Clicks (otros)'+','+'Clicks (photos)'+','+'Clicks (links)'
-
-    f.write((fields+'\n').encode('utf8'))
+    f = open(csvfile, 'w')
+    f.write(fields)
     while cond:
         for post in jsonContent['data']:
             if 'message' in post:
-                print post['id']
-                post_insights = get_insights(post['id'],accessToken)
-                post_id =post['id']
-                message = post['message']
+                post_id = post['id']
+                print post_id
+                post_insights = get_insights(post_id, accessToken)
+                message = '|' + post['message'] + '|'
                 if 'shares' in post:
-                    shares=post['shares']['count']
+                    shares = str(post['shares']['count'])
                 else:
-                    shares=0
-                time=post["created_time"]
-                comments=len(get_comments(post['id'],accessToken))
-                likes=len(get_likes(post['id'],accessToken))
+                    shares = '0'
+                time = '|' + post["created_time"] + '|'
+                comments = str(len(get_comments(post_id, accessToken)))
+                likes = str(len(get_likes(post_id, accessToken)))
 
-                text_insights=''
-                for ins in post_insights:
-                    text_insights = text_insights + ',' + str(ins)
-                output_text=post_id+',|'+message+'|'+',|'+time+'|,'+str(likes)+','+str(comments)+','+str(shares) + text_insights
-                f.write((output_text+'\n').encode('utf8'))
+                output_text = [post_id, message, time, likes, comments, shares] + post_insights
+                output_text = ','.join(output_text).encode('utf8') + '\n'
+                f.write(output_text)
+                print output_text
 
-                print ((output_text).encode('utf8'))
-        cond =  'paging' in jsonContent
+        cond = 'paging' in jsonContent
 
         if cond:
-            print jsonContent['paging']['next']
             url = jsonContent['paging']['next']
-            jsonContent=get_json(url)
+            print url
+            jsonContent = get_json(url)
 
     f.close()
 
+
+if __name__ == '__main__':
+    get_page_impact('PartidoXPartidodelFuturo')  # Partido X
     return 0
-
-
-
-get_page_impact('PartidoXPartidodelFuturo') #Partido X
-
-
-
-
-
