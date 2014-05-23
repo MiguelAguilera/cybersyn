@@ -73,7 +73,8 @@ if __name__ == "__main__":
             except Exception, e:
                 print str(e)
                 print "Attempt failed, retrying..."
-            driver.quit()
+            finally:
+                driver.quit()
     else:
         print "Usage: " + argv[0] + " <login> <password>"
         exit(1)
