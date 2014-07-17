@@ -6,9 +6,16 @@ from simplejson import loads
 import time
 
 
+def get_access_keys_from_file(filename='fb.keys'):
+    with open(filename) as f:
+        FACEBOOK_APP_ID = f.readline().strip("\n")
+        FACEBOOK_APP_SECRET = f.readline().strip("\n")
+    return (FACEBOOK_APP_ID, FACEBOOK_APP_SECRET)
+
+
 def get_access_token_from_file(filename='fb.token'):
-    with open('fb.token') as f:
-        accessToken = 'access_token=' + f.readline().strip("\n")
+    with open(filename) as f:
+        accessToken = f.readline().strip("\n")
     return accessToken
 
 
