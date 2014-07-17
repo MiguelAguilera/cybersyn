@@ -2,118 +2,66 @@
 # coding: utf-8
 
 
-from urllib2 import urlopen, URLError, HTTPError, Request
-from simplejson import loads
-import json
-import time
-import codecs
-
-def get_json(url):
-
-    read=False
-    jsonContent={}
-    while not read:
-        req = Request(url)
-        try:
-            content=urlopen(url)
-            jsonContent = loads(content.read())
-#           print 'read'
-            read=True
-        except URLError as e:
-            print 'URLError', e
-            if e.getcode()==403:
-                print e.getcode()
-                jsonContent=None
-                print 'Waiting for 300s'
-                time.sleep(300)
-                read=True
-            else:
-                print 'Waiting for 30s'
-                time.sleep(30)
-
-        except HTTPError as e:
-            print 'HTTPError',e
-            if e.getcode()==403:
-                print e.getcode()
-                jsonContent=None
-                print 'Waiting for 300s'
-                time.sleep(300)
-                read=True
-            else:
-                print 'Waiting for 300s'
-                time.sleep(300)
-    return jsonContent
-
-
-
-filename='insights.json'
 import os.path
+import codecs
+import json
+from fb_utils import get_json, get_access_token_from_file, get_access_keys_from_file
+
+
+filename = 'insights.json'
 if os.path.isfile(filename):
-    json_data=open(filename)
+    json_data = open(filename)
     data = json.load(json_data)
     json_data.close()
 else:
-    data=[]
+    data = []
 
-
-with open('fb.keys') as f:
-    FACEBOOK_APP_ID = f.readline().strip("\n")
-    FACEBOOK_APP_SECRET = f.readline().strip("\n")
-
-
-with open('fb.token') as f:
-    accessToken = f.readline().strip("\n")
-
+(FACEBOOK_APP_ID, FACEBOOK_APP_SECRET) = get_access_keys_from_file()
+accessToken = get_access_token_from_file()
 print accessToken
 
+userId = '473881175964178'
 
-
-userId='473881175964178'
-
-tasks=[ 'page_impressions_by_age_gender_unique/day',
-        'page_impressions_by_city_unique/day',
-        'page_story_adds_by_age_gender_unique/day',
-        'page_story_adds_by_city_unique/day'
-        ]
+tasks = ['page_impressions_by_age_gender_unique/day',
+         'page_impressions_by_city_unique/day',
+         'page_story_adds_by_age_gender_unique/day',
+         'page_story_adds_by_city_unique/day'
+         ]
 
 for task in tasks:
 
-    name=task[5:-11]
+    name = task[5:-11]
     print name
-    url ='https://graph.facebook.com/'+userId+'/insights/'+task+'?access_token='+ accessToken
+    url = 'https://graph.facebook.com/' + userId + '/insights/' + task + '?access_token=' + accessToken
 
     #url ='https://graph.facebook.com/'+userId+'/insights?access_token='+ accessToken
 #   print url
-    insights=get_json(url)
+    insights = get_json(url)
 
     for i in insights['data']:
 
         print i['description']
         for v in i['values']:
 
-            day=v['end_time']
+            day = v['end_time']
 
-            isday=False
+            isday = False
 
             if not len(data):
-                data=[{ "day": day}]
+                data = [{"day": day}]
             for i in range(len(data)):
-                if data[i]['day']==day:
-                    isday=True
-                    dayind=i
+                if data[i]['day'] == day:
+                    isday = True
+                    dayind = i
             if not isday:
-                dayind=len(data)
-                data=data+[{'day':day}]
+                dayind = len(data)
+                data = data + [{'day':day}]
             print day
             print dayind
 
-            data[dayind][name]=v['value']
+            data[dayind][name] = v['value']
 
-
-
-    url_next= insights['paging']['next']
+    url_next = insights['paging']['next']
 
 with codecs.open(filename, 'w', "utf-8") as outfile:
-  json.dump(data, outfile,ensure_ascii=False)
-
-
+    json.dump(data, outfile, ensure_ascii=False)
