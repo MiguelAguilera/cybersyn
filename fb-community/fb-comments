@@ -1,112 +1,68 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-
-from urllib2 import urlopen, URLError, HTTPError, Request
-from simplejson import loads
 import json
-import time
-
-def get_json(url):
-
-    read=False
-    jsonContent={}
-    while not read:
-        req = Request(url)
-        count = 0
-        try:
-            content=urlopen(url)
-            jsonContent = loads(content.read())
-#           print 'read'
-            read=True
-        except URLError as e:
-            print 'URLError', e
-            if count >= 10:
-                print e
-                jsonContent=None
-                print 'Waiting for 300s'
-                time.sleep(300)
-                read=True
-            else:
-                print 'Waiting for 60s'
-                count+=1
-                time.sleep(60)
-
-        except HTTPError as e:
-            print 'HTTPError',e
-            if count>=10:
-                print e.getcode()
-                jsonContent=None
-                print 'Waiting for 300s'
-                time.sleep(300)
-                read=True
-            else:
-                print 'Waiting for 60s'
-                count+=1
-                time.sleep(60)
-    return jsonContent
+from urllib2 import urlopen
+from fb_utils import get_json, get_access_keys_from_file
 
 
-def get_gender_likes(post_id,accessToken):
-    malelikes=0
-    femalelikes=0
+def get_gender_likes(post_id, accessToken):
+    malelikes = 0
+    femalelikes = 0
 
-    def count_likes(likes,malelikes,femalelikes):
+    def count_likes(likes, malelikes, femalelikes):
         for like in likes['data']:
-            user_url ='https://graph.facebook.com/'+str(like['id'])
-            user=get_json(user_url)
+            user_url = 'https://graph.facebook.com/' + str(like['id'])
+            user = get_json(user_url)
             if user is not None:
                 if 'gender' in user:
-                    if user['gender']=='male':
-                        malelikes+=1
-                    elif user['gender']=='female':
-                        femalelikes+=1
+                    if user['gender'] == 'male':
+                        malelikes += 1
+                    elif user['gender'] == 'female':
+                        femalelikes += 1
 
         return malelikes, femalelikes
 
-    likes_url = 'https://graph.facebook.com/'+str(post_id)+'/likes?limit=200&'+ accessToken
-    likes=get_json(likes_url)
+    likes_url = 'https://graph.facebook.com/' + str(post_id) + '/likes?limit=200&' + accessToken
+    likes = get_json(likes_url)
     if len(likes['data']):
-        malelikes, femalelikes = count_likes(likes,malelikes,femalelikes)
+        malelikes, femalelikes = count_likes(likes, malelikes, femalelikes)
         while 'next' in likes['paging']:
             nextlikes_url = likes['paging']['next']
-            likes=get_json(nextlikes_url)
+            likes = get_json(nextlikes_url)
             malelikes, femalelikes = count_likes(likes, malelikes, femalelikes)
     return malelikes, femalelikes
 
+
 def get_users_ids(userId):
 
-    with open('fb.keys') as f:
-        FACEBOOK_APP_ID = f.readline().strip("\n")
-        FACEBOOK_APP_SECRET = f.readline().strip("\n")
+    (FACEBOOK_APP_ID, FACEBOOK_APP_SECRET) = get_access_keys_from_file()
 
-
-    token_url='https://graph.facebook.com/oauth/access_token?grant_type=client_credentials&client_id='+FACEBOOK_APP_ID+'&client_secret='+FACEBOOK_APP_SECRET
+    token_url = 'https://graph.facebook.com/oauth/access_token?grant_type=client_credentials&client_id=' + FACEBOOK_APP_ID + '&client_secret=' + FACEBOOK_APP_SECRET
 
     accessToken = urlopen(token_url).read()
 
-    url ='https://graph.facebook.com/'+userId+'/posts?fields=id,message&' + accessToken
+    url = 'https://graph.facebook.com/' + userId + '/posts?fields=id,message&' + accessToken
     print url
 
-    jsonContent=get_json(url)
+    jsonContent = get_json(url)
 
 #   print jsonContent
 
-    count=0
-    cond=True
+    cond = True
 #   print 'test'
-#   malelikes,femalelikes = get_gender_likes(10152572427374689,accessToken)
+#   malelikes,femalelikes = get_gender_likes(10152572427374689, accessToken)
 #   print malelikes,femalelikes
 #   likes = set()
-    posts=[]
+    posts = []
     while cond:
         for post in jsonContent['data']:
             if 'message' in post:
                 print post['id']
                 print post['message']
-                malelikes,femalelikes = get_gender_likes(post['id'],accessToken)
-                print malelikes,femalelikes
-                posts.append({'message': post['message'], 'malelikes' : malelikes,'femalelikes' : femalelikes})
+                malelikes, femalelikes = get_gender_likes(post['id'], accessToken)
+                print malelikes, femalelikes
+                posts.append({'message': post['message'], 'malelikes': malelikes, 'femalelikes': femalelikes})
                 print posts
                 print len(posts)
 
@@ -120,12 +76,12 @@ def get_users_ids(userId):
 #               print femalelikes
 
 #       print len(likes)
-        cond =  'paging' in jsonContent
+        cond = 'paging' in jsonContent
 
         if cond:
             print jsonContent['paging']['next']
             url = jsonContent['paging']['next']
-            jsonContent=get_json(url)
+            jsonContent = get_json(url)
 
         with open('likes_gender.json', 'w') as outfile:
             json.dump(posts, outfile)
@@ -135,7 +91,3 @@ def get_users_ids(userId):
 
 likesX = get_users_ids('473881175964178')
 print len(likesX)
-
-
-
-
