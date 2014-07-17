@@ -7,6 +7,7 @@ accessToken = ""
 
 
 def get_likes(post_id):
+    global accessToken
     likes_url = 'https://graph.facebook.com/' + str(post_id) + '/likes?limit=200&' + accessToken
     likes = get_json(likes_url)
 
@@ -21,6 +22,7 @@ def get_likes(post_id):
 
 
 def get_insights(post_id):
+    global accessToken
     print 'Getting insights for post:', str(post_id)
     values = []
     tasks = [
@@ -60,6 +62,7 @@ def get_insights(post_id):
 
 
 def get_comments(post_id):
+    global accessToken
     comments_url = 'https://graph.facebook.com/' + str(post_id) + '/comments?limit=200&' + accessToken
     comments = get_json(comments_url)
 
@@ -91,9 +94,8 @@ def get_user_url(user_id):
 
 
 def get_page_impact(pageId):
-#   with open('fb.keys') as f:
-#       FACEBOOK_APP_ID = f.readline().strip("\n")
-#       FACEBOOK_APP_SECRET = f.readline().strip("\n")
+    global accessToken
+#   (FACEBOOK_APP_ID, FACEBOOK_APP_SECRET) = get_access_keys_from_file()
 #   token_url='https://graph.facebook.com/oauth/access_token?grant_type=client_credentials&client_id='+FACEBOOK_APP_ID+'&client_secret='+FACEBOOK_APP_SECRET
 #   accessToken = urlopen(token_url).read()
 
@@ -143,7 +145,6 @@ def get_page_impact(pageId):
 
 
 if __name__ == '__main__':
-    global accessToken
-    accessToken = get_access_token_from_file()
+    accessToken = 'access_token=' + get_access_token_from_file()
 
     get_page_impact('PartidoXPartidodelFuturo')  # Partido X
