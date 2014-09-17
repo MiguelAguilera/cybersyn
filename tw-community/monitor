@@ -1,0 +1,112 @@
+#!/usr/bin/python
+# coding: utf-8
+
+from twython import Twython
+import time
+from random import randrange
+from twython import exceptions
+import datetime
+import json
+import os.path
+import csv
+import signal
+
+from twython import TwythonStreamer
+
+class MyStreamer(TwythonStreamer):
+    def on_success(self, data):
+	backoff=0
+	backoff420=0	
+        if 'text' in data:
+		signal.alarm(timeout)	
+            	print "save user",data['user']['screen_name']
+            	user=data['user']['screen_name']
+		twid=data['id_str']
+            	mentions=''
+            	for mention in data['entities']["user_mentions"]:
+            		print mention['screen_name']
+            		mentions=mentions + mention['screen_name'] + ','
+            	mentions=mentions[0:-1]
+		print twid
+            	print data['text'].encode('utf-8')
+            	createdtime= data['created_at']
+		print start_time
+		time_now=datetime.datetime.now()
+		print time_now
+		print (time_now - start_time).seconds
+		with open(OUTPUT,'a') as fo:
+			fo.write(twid+','+user+','+createdtime+','+mentions+'\n')
+		#if (time_now - start_time).seconds > timeout:
+		#	self.disconnect()
+			
+    def on_error(self, status_code, data):
+        print status_code
+	print data
+        print 'sleeping'
+        if status_code==420:
+		backoff420+=1
+		waitingtime=60*2**backoff420
+	else:
+		backoff+=1
+		waitingtime=5*2**backoff
+		if waitingtime>320:
+			waitingtime=320
+	print 'waiting time', waitingtime
+	signal.alarm(waitingtime*2)
+	time.sleep(waitingtime)
+        # Want to stop trying to get data because of the error?
+        # Uncomment the next line!
+        self.disconnect()
+
+#    def timeout(signum,frame):
+#	raise Exception("timed out!")
+    
+def signal_handler(signum, frame):
+	print 'Signal handler called with signal', signum
+	raise Exception("Timed out!")
+
+
+keys_file='tw.keys'
+with open(keys_file) as f:
+    APP_KEY = f.readline().strip("\n")
+    APP_SECRET = f.readline().strip("\n")
+    OAUTH_KEY = f.readline().strip("\n")
+    OAUTH_SECRET = f.readline().strip("\n")
+    
+
+OUTPUT = 'monitor'
+
+timeout=60*60
+backoff=0
+backoff420=0
+
+cond=True
+start_time=datetime.datetime.now()
+signal.signal(signal.SIGALRM, signal_handler)
+
+keywords=''
+
+while cond:
+
+	start_time=datetime.datetime.now()
+
+	timeout=60*60
+	signal.alarm(timeout)
+	backoff=0
+	backoff420=0
+	try:
+    		stream = MyStreamer(APP_KEY, APP_SECRET,OAUTH_KEY,OAUTH_SECRET)
+		stream.statuses.filter(track=keywords)
+        except Exception, msg:
+		print Exception
+		print msg
+		print
+                print "Timed out!"
+		print
+	print 'restart'
+	time_now= datetime.datetime.now()
+	print start_time
+	print time_now
+	print (time_now - start_time).seconds 
+
+	
